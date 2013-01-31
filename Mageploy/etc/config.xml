@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <PugMoRe_Mageploy>
+            <version>1.0.0</version>
+        </PugMoRe_Mageploy>
+    </modules>
+    
+    <global>
+        <models>
+            <pugmore_mageploy>
+                <class>PugMoRe_Mageploy_Model</class>
+            </pugmore_mageploy>
+        </models>
+    </global>
+    
+    <adminhtml>
+        <events>
+            <controller_action_predispatch>
+                <observers>
+                    <mageploy_response>
+                        <type>singleton</type>
+                        <class>pugmore_mageploy/observer</class>          
+                        <method>observeRequest</method>
+                    </mageploy_response>
+                </observers>
+            </controller_action_predispatch>
+        </events>        
+    </adminhtml>
+    
+    <default>
+        <mageploy>
+            <actions>
+                <catalog_product_attribute>
+                    <disabled>0</disabled>
+                    <class>PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute</class>
+                </catalog_product_attribute>
+            </actions>
+        </mageploy>
+    </default>
+</config>
