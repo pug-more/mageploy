@@ -1,2 +1,3 @@
 Mageploy                app/code/community/PugMoRe/Mageploy/
 PugMoRe_Mageploy.xml    app/etc/modules/PugMoRe_Mageploy.xml
+mageploy.php		shell/mageploy.php
