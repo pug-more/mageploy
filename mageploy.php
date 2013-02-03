@@ -79,9 +79,14 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                             $request = $actionRecorder->decode($parameters);
                             $controller = new $controllerClassName($request, new Mage_Core_Controller_Response_Http());
                             $action = $row[3].'Action';
-                            $controller->preDispatch();
-                            $controller->$action();
-                            $executed ++;
+                            try {
+                                $controller->preDispatch();
+                                $controller->$action();
+                                $executed ++;
+                            } catch(Exception $e) {
+                                // @todo check errors in session, because exception are catched
+                                printf("%s\r\n", $e->getMessage());
+                            }
                             // @todo register executed action
                         } else {
                             printf("Error: class '%s' not found!\r\n", $controllerClassName);
