@@ -48,7 +48,8 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
             }
             
             $result[] = get_class($this);
-            $result[] = $this->_request->getModuleName();
+            #$result[] = $this->_request->getModuleName();
+            $result[] = $this->_request->getControllerModule();
             $result[] = $this->_request->getControllerName();
             $result[] = $this->_request->getActionName();
             $result[] = serialize($params);
@@ -60,15 +61,23 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
     
     /*
      * return Mage_Core_Controller_Request_Http
-    public function decode($stream) {
-        $result = array();
-        if ($this->_request) {
-            
-        } else {
-            $result = false;
+     */
+    public function decode($serializedParameters) {
+        $parameters = unserialize($serializedParameters);
+        $attributeCode = $parameters['mageploy_uuid'];
+        
+        $attributeInfo = Mage::getResourceModel('eav/entity_attribute_collection')
+                ->setCodeFilter($attributeCode)
+                ->getFirstItem();
+        
+        if ($attributeId = $attributeInfo->getId()) {
+            $parameters['attribute_id'] = $attributeId;
         }
-        return $result;
+        
+        $request = new Mage_Core_Controller_Request_Http();
+        #$request->setParams($parameters);
+        $request->setPost($parameters);
+        $request->setQuery($parameters);
+        return $request;
     }
-     */ 
-
 }

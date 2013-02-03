@@ -12,6 +12,12 @@
                 <class>PugMoRe_Mageploy_Model</class>
             </pugmore_mageploy>
         </models>
+
+        <helpers>
+            <pugmore_mageploy>
+                <class>PugMoRe_Mageploy_Helper</class>
+            </pugmore_mageploy>
+        </helpers>
     </global>
     
     <adminhtml>

@@ -11,8 +11,9 @@ class PugMoRe_Mageploy_Model_Io_File {
     
     public function __construct()
     {
-        $this->_todo = fopen(Mage::getBaseDir().DS.'var'.DS.'log'.DS.'todo.csv', 'a');
-        $this->_done = fopen(Mage::getBaseDir().DS.'var'.DS.'log'.DS.'done.csv', 'a');
+        $helper = Mage::helper('pugmore_mageploy');
+        $this->_todo = fopen($helper->getStoragePath().$helper->getAllActionsFilename(), 'a');
+        $this->_done = fopen($helper->getStoragePath().$helper->getExecutedActionsFilename(), 'a');
         //$this->_done = fopen(Mage::getBaseDir().DS.'done.csv', 'a');
     }
     
