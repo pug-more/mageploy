@@ -41,7 +41,6 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
             } else {
                 // existing entity
                 $attributeSet = Mage::getModel('eav/entity_attribute_set')->load($params['id']);
-                #$attribute = Mage::getModel('catalog/entity_attribute')->load($params['attribute_id']);
                 $params['mageploy_uuid'] = $attributeSet->getAttributeSetName();
                 $newOrExisting = 'existing';
             }
@@ -52,8 +51,11 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
                 }
             }
             
+            // @todo json_decode $params['data']
+            // @todo convert attribute IDs to UUIDs in $params['data']
+            // @todo json_encode $params['data']
+            
             $result[self::INDEX_EXECUTOR_CLASS] = get_class($this);
-            #$result[] = $this->_request->getModuleName();
             $result[self::INDEX_CONTROLLER_MODULE] = $this->_request->getControllerModule();
             $result[self::INDEX_CONTROLLER_NAME] = $this->_request->getControllerName();
             $result[self::INDEX_ACTION_NAME] = $this->_request->getActionName();
@@ -79,7 +81,6 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
             $parameters['id'] = $attributeSetId;
         }
         $request = new Mage_Core_Controller_Request_Http();
-        #$request->setParams($parameters);
         $request->setPost($parameters);
         $request->setQuery($parameters);
         return $request;
