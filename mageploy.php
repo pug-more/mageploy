@@ -51,12 +51,12 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
         } else if ($this->getArg('run')) {
             $pendingList = $this->_io->getPendingList();
             if (count($pendingList)) {
+                $executed = 0;
                 foreach ($pendingList as $row) {
                     $actionExecutorClass = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_EXECUTOR_CLASS];
                     $controllerModule = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_CONTROLLER_MODULE];
                     $controllerName = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_CONTROLLER_NAME];
                     $controllerClassName = $this->_getControllerClassName($controllerModule, $controllerName);
-                    $executed = 0;
                     if (class_exists($actionExecutorClass)) {
                         $controllerFileName = $this->_getControllerClassPath($controllerModule, $controllerName);
                         if (file_exists($controllerFileName)) {
@@ -74,9 +74,8 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                             $controller->$action();
                             $controller->postDispatch();
                             $executed ++;
-                            // @todo register executed action
+                            // register executed action
                             $this->_io->done($row);
-
                         } else {
                             printf("Error: class '%s' not found!\r\n", $controllerClassName);
                         }
