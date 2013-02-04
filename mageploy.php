@@ -1,4 +1,5 @@
 <?php
+
 if (file_exists('abstract.php')) {
     require_once 'abstract.php';
 } else {
@@ -11,6 +12,12 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
         'status'    => 'Show if there are any changes to be imported',
         'run'       => 'Import changes',
     );
+
+    protected function _construct()
+    {
+        $this->_io = new PugMoRe_Mageploy_Model_Io_File();
+        return parent::_construct();
+    }
 
     protected function _getControllerClassPath($controllerModule, $controllerName) {
         $parts = explode('_', uc_words($controllerName));
@@ -28,23 +35,9 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
         return $class;
     }
 
-    protected function _getPendingList() {
-        $helper = Mage::helper('pugmore_mageploy');
-        $csv = new Varien_File_Csv();
-        try {
-            $todoList = $csv->getData($helper->getStoragePath().$helper->getAllActionsFilename());
-            $doneList = $csv->getData($helper->getStoragePath().$helper->getExecutedActionsFilename());
-            $pendingList = array_diff($todoList, $doneList);
-        } catch (Exception $e) {
-            Mage::log($e->getMessage(), null, 'mageploy.log', true);
-            $pendingList = array();
-        }
-        return $pendingList;
-    }
-
     public function run() {
         if ($this->getArg('status')) {
-            $pendingList = $this->_getPendingList();
+            $pendingList = $this->_io->getPendingList();
             if (count($pendingList)) {
                 foreach ($pendingList as $row) {
                     $actionDescr = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_DESCR];
@@ -56,7 +49,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                 printf("There aren't any pending actions to execute.\r\n");
             }
         } else if ($this->getArg('run')) {
-            $pendingList = $this->_getPendingList();
+            $pendingList = $this->_io->getPendingList();
             if (count($pendingList)) {
                 foreach ($pendingList as $row) {
                     $actionExecutorClass = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_EXECUTOR_CLASS];
