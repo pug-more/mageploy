@@ -1,14 +1,14 @@
 <?php
 /**
- * Description of Attribute
+ * Description of Attribute Set
  *
  * @author Alessandro Ronchi <aronchi at webgriffe.com>
  */
-class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Mageploy_Model_Action_Abstract {
+class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe_Mageploy_Model_Action_Abstract {
 
-    protected $_code = 'catalog_product_attribute';
+    protected $_code = 'catalog_product_attributeSet';
     
-    protected $_blankableParams = array('attribute_id', 'key', 'form_key', 'back', 'tab');
+    protected $_blankableParams = array('id', 'key', 'isAjax', 'gotoEdit', 'form_key');
     
     public function match() {
         if (!$this->_request) {
@@ -17,7 +17,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
         
         if ($this->_request->getModuleName() == 'admin')
         {
-            if ($this->_request->getControllerName() == 'catalog_product_attribute') {
+            if ($this->_request->getControllerName() == 'catalog_product_set') {
                 if (in_array($this->_request->getActionName(), array(/*'validate', */'save', 'delete'))) {
                     return true;
                 }
@@ -29,18 +29,20 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
     
     public function encode() {
         $result = array();
+
         if ($this->_request) {
             $params = $this->_request->getParams();
             
             $newOrExisting = '';
-            if (isset($params['attribute_code'])) {
+            if (isset($params['attribute_set_name'])) {
                 // new entity
-                $params['mageploy_uuid'] = $params['attribute_code'];
+                $params['mageploy_uuid'] = $params['attribute_set_name'];
                 $newOrExisting = 'new';
             } else {
                 // existing entity
-                $attribute = Mage::getModel('catalog/entity_attribute')->load($params['attribute_id']);
-                $params['mageploy_uuid'] = $attribute->getAttributeCode();
+                $attributeSet = Mage::getModel('eav/entity_attribute_set')->load($params['id']);
+                #$attribute = Mage::getModel('catalog/entity_attribute')->load($params['attribute_id']);
+                $params['mageploy_uuid'] = $attributeSet->getAttributeSetName();
                 $newOrExisting = 'existing';
             }
             
@@ -56,10 +58,11 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
             $result[self::INDEX_CONTROLLER_NAME] = $this->_request->getControllerName();
             $result[self::INDEX_ACTION_NAME] = $this->_request->getActionName();
             $result[self::INDEX_ACTION_PARAMS] = serialize($params);
-            $result[self::INDEX_ACTION_DESCR] = sprintf("%s %s Attribute with UUID '%s'", ucfirst($this->_request->getActionName()), $newOrExisting, $params['mageploy_uuid']);
+            $result[self::INDEX_ACTION_DESCR] = sprintf("%s %s Attribute Set with UUID '%s'", ucfirst($this->_request->getActionName()), $newOrExisting, $params['mageploy_uuid']);
         } else {
             $result = false;
         }
+
         return $result;
     }
     
@@ -68,16 +71,13 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
      */
     public function decode($serializedParameters) {
         $parameters = unserialize($serializedParameters);
-        $attributeCode = $parameters['mageploy_uuid'];
+        $attributeSetName = $parameters['mageploy_uuid'];
         
-        $attributeInfo = Mage::getResourceModel('eav/entity_attribute_collection')
-                ->setCodeFilter($attributeCode)
-                ->getFirstItem();
+        $attributeSet = Mage::getModel('eav/entity_attribute_set')->load($attributeSetName, 'attribute_set_name');
         
-        if ($attributeId = $attributeInfo->getId()) {
-            $parameters['attribute_id'] = $attributeId;
+        if ($attributeSetId = $attributeSet->getId()) {
+            $parameters['id'] = $attributeSetId;
         }
-        
         $request = new Mage_Core_Controller_Request_Http();
         #$request->setParams($parameters);
         $request->setPost($parameters);

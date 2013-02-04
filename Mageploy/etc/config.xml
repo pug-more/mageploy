@@ -41,6 +41,10 @@
                     <disabled>0</disabled>
                     <class>PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute</class>
                 </catalog_product_attribute>
+                <catalog_product_attributeSet>
+                    <disabled>0</disabled>
+                    <class>PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet</class>
+                </catalog_product_attributeSet>
             </actions>
         </mageploy>
     </default>
