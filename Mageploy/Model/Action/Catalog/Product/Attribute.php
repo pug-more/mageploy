@@ -70,11 +70,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
         $parameters = unserialize($serializedParameters);
         $attributeCode = $parameters['mageploy_uuid'];
         
-        $attributeInfo = Mage::getResourceModel('eav/entity_attribute_collection')
-                ->setCodeFilter($attributeCode)
-                ->getFirstItem();
-        
-        if ($attributeId = $attributeInfo->getId()) {
+        if ($attributeId = Mage::helper('pugmore_mageploy')->getAttributeIdFromCode($attributeCode)) {
             $parameters['attribute_id'] = $attributeId;
         }
         

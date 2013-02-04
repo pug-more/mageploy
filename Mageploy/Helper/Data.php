@@ -18,4 +18,11 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract {
         return 'mageploy_all.csv';
     }
     
+    public function getAttributeIdFromCode($attributeCode) {
+        $attributeInfo = Mage::getResourceModel('eav/entity_attribute_collection')
+                ->setCodeFilter($attributeCode)
+                ->getFirstItem();
+        return $attributeInfo->getId();
+    }
+    
 }
