@@ -1,7 +1,7 @@
 <?php
 if (file_exists('abstract.php')) {
     require_once 'abstract.php';
-} else { 
+} else {
     require_once 'shell/abstract.php';
 }
 
@@ -21,12 +21,12 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
         $file .= 'Controller.php';
         return $file;
     }
-    
+
     public function _getControllerClassName($controllerModule, $controllerName)
     {
         $class = $controllerModule.'_'.uc_words($controllerName).'Controller';
         return $class;
-    }    
+    }
 
     protected function _getPendingList() {
         $helper = Mage::helper('pugmore_mageploy');
@@ -41,7 +41,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
         }
         return $pendingList;
     }
-    
+
     public function run() {
         if ($this->getArg('status')) {
             $pendingList = $this->_getPendingList();
@@ -72,9 +72,9 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                             printf("Error: file '%s' not found!\r\n", $controllerFileName);
                         }
                         if (class_exists($controllerClassName)) {
-                            $actionRecorder = new $actionExecutorClass();
+                            $actionExecutor = new $actionExecutorClass();
                             $parameters = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_PARAMS];
-                            $request = $actionRecorder->decode($parameters);
+                            $request = $actionExecutor->decode($parameters);
                             $controller = new $controllerClassName($request, new Mage_Core_Controller_Response_Http());
                             $action = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_NAME].'Action';
                             $controller->preDispatch();
@@ -82,6 +82,8 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                             $controller->postDispatch();
                             $executed ++;
                             // @todo register executed action
+                            $this->_io->done($row);
+
                         } else {
                             printf("Error: class '%s' not found!\r\n", $controllerClassName);
                         }
@@ -97,7 +99,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
             echo $this->usageHelp();
         }
     }
-    
+
     public function usageHelp() {
         $help = "\r\nUsage:\tphp mageploy.php --[options]\r\n\r\n";
         foreach ($this->_options as $option => $description) {
