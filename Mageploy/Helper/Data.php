@@ -11,11 +11,11 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract {
     }
     
     public function getExecutedActionsFilename() {
-        return 'done.csv';
+        return 'mageploy_executed.csv';
     }
     
     public function getAllActionsFilename() {
-        return 'todo.csv';
+        return 'mageploy_all.csv';
     }
     
 }

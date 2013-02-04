@@ -32,13 +32,16 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
         if ($this->_request) {
             $params = $this->_request->getParams();
             
+            $newOrExisting = '';
             if (isset($params['attribute_code'])) {
                 // new entity
                 $params['mageploy_uuid'] = $params['attribute_code'];
+                $newOrExisting = 'new';
             } else {
                 // existing entity
                 $attribute = Mage::getModel('catalog/entity_attribute')->load($params['attribute_id']);
                 $params['mageploy_uuid'] = $attribute->getAttributeCode();
+                $newOrExisting = 'existing';
             }
             
             foreach ($this->_blankableParams as $key) {
@@ -53,7 +56,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
             $result[self::INDEX_CONTROLLER_NAME] = $this->_request->getControllerName();
             $result[self::INDEX_ACTION_NAME] = $this->_request->getActionName();
             $result[self::INDEX_ACTION_PARAMS] = serialize($params);
-            $result[self::INDEX_ACTION_DESCR] = sprintf("%s attribute with UUID '%s'", ucfirst($this->_request->getActionName()), $params['mageploy_uuid']);
+            $result[self::INDEX_ACTION_DESCR] = sprintf("%s %s attribute with UUID '%s'", ucfirst($this->_request->getActionName()), $newOrExisting, $params['mageploy_uuid']);
         } else {
             $result = false;
         }

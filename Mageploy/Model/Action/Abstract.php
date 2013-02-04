@@ -29,4 +29,8 @@ abstract class PugMoRe_Mageploy_Model_Action_Abstract {
     }
     
     public abstract function match();
+
+    public abstract function encode();
+    
+    public abstract function decode($serializedParameters);
 }
