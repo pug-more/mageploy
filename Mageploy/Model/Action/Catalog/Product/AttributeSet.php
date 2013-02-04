@@ -75,11 +75,14 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
         $parameters = unserialize($serializedParameters);
         $attributeSetName = $parameters['mageploy_uuid'];
         
-        $attributeSet = Mage::getModel('eav/entity_attribute_set')->load($attributeSetName, 'attribute_set_name');
-        
-        if ($attributeSetId = $attributeSet->getId()) {
+        if ($attributeSetId = Mage::helper('pugmore_mageploy')->getAttributeSetIdFromName($attributeSetName)) {
             $parameters['id'] = $attributeSetId;
         }
+        
+        // @todo json_decode $params['data']
+        // @todo convert attribute UUIDs to IDs in $params['data']
+        // @todo json_encode $params['data']
+        
         $request = new Mage_Core_Controller_Request_Http();
         $request->setPost($parameters);
         $request->setQuery($parameters);
