@@ -44,7 +44,7 @@ class PugMoRe_Mageploy_Model_Io_File {
             foreach ( array_diff ($todo, $done) as $k=>$v) {
                 $pendingList[$k] = $todoList[$k];
             }
-            print_r($pendingList);
+            #print_r($pendingList);
         } catch (Exception $e) {
             Mage::log($e->getMessage(), null, 'mageploy.log', true);
         }
