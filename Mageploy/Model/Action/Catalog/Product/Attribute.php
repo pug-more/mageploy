@@ -47,12 +47,13 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
                 }
             }
             
-            $result[] = get_class($this);
+            $result[self::INDEX_EXECUTOR_CLASS] = get_class($this);
             #$result[] = $this->_request->getModuleName();
-            $result[] = $this->_request->getControllerModule();
-            $result[] = $this->_request->getControllerName();
-            $result[] = $this->_request->getActionName();
-            $result[] = serialize($params);
+            $result[self::INDEX_CONTROLLER_MODULE] = $this->_request->getControllerModule();
+            $result[self::INDEX_CONTROLLER_NAME] = $this->_request->getControllerName();
+            $result[self::INDEX_ACTION_NAME] = $this->_request->getActionName();
+            $result[self::INDEX_ACTION_PARAMS] = serialize($params);
+            $result[self::INDEX_ACTION_DESCR] = sprintf("%s attribute with UUID '%s'", ucfirst($this->_request->getActionName()), $params['mageploy_uuid']);
         } else {
             $result = false;
         }

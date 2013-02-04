@@ -47,10 +47,9 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
             $pendingList = $this->_getPendingList();
             if (count($pendingList)) {
                 foreach ($pendingList as $row) {
-                    $actionName = sprintf("%s/%s", $row[1], $row[2]);
-                    $actionMethod = $row[3];
-                    $spacer = str_repeat(" ", 40 - strlen($actionName));
-                    printf("%s:%s%s\r\n", $actionName, $spacer, $actionMethod);
+                    $actionDescr = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_DESCR];
+                    $spacer = str_repeat(" ", 40 - strlen($actionDescr));
+                    printf("%s\r\n", $actionDescr);
                 }
                 printf("---\r\nTotal pending actions: %d\r\n", count($pendingList));
             } else {
@@ -60,13 +59,12 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
             $pendingList = $this->_getPendingList();
             if (count($pendingList)) {
                 foreach ($pendingList as $row) {
-                    $actionRecorderClass = $row[0];
-                    $controllerModule = $row[1];
-                    $controllerName = $row[2];
+                    $actionExecutorClass = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_EXECUTOR_CLASS];
+                    $controllerModule = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_CONTROLLER_MODULE];
+                    $controllerName = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_CONTROLLER_NAME];
                     $controllerClassName = $this->_getControllerClassName($controllerModule, $controllerName);
                     $executed = 0;
-                    if (class_exists($actionRecorderClass)) {
-                        // @todo include controller file class
+                    if (class_exists($actionExecutorClass)) {
                         $controllerFileName = $this->_getControllerClassPath($controllerModule, $controllerName);
                         if (file_exists($controllerFileName)) {
                             include_once $controllerFileName;
@@ -74,25 +72,21 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                             printf("Error: file '%s' not found!\r\n", $controllerFileName);
                         }
                         if (class_exists($controllerClassName)) {
-                            $actionRecorder = new $actionRecorderClass();
-                            $parameters = $row[4];
+                            $actionRecorder = new $actionExecutorClass();
+                            $parameters = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_PARAMS];
                             $request = $actionRecorder->decode($parameters);
                             $controller = new $controllerClassName($request, new Mage_Core_Controller_Response_Http());
-                            $action = $row[3].'Action';
-                            try {
-                                $controller->preDispatch();
-                                $controller->$action();
-                                $executed ++;
-                            } catch(Exception $e) {
-                                // @todo check errors in session, because exception are catched
-                                printf("%s\r\n", $e->getMessage());
-                            }
+                            $action = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_NAME].'Action';
+                            $controller->preDispatch();
+                            $controller->$action();
+                            $controller->postDispatch();
+                            $executed ++;
                             // @todo register executed action
                         } else {
                             printf("Error: class '%s' not found!\r\n", $controllerClassName);
                         }
                     } else {
-                        printf("Error: class '%s' not found!\r\n", $actionRecorderClass);
+                        printf("Error: class '%s' not found!\r\n", $actionExecutorClass);
                     }
                 }
                 printf("---\r\nExecuted actions: %d/%d\r\n", $executed, count($pendingList));
