@@ -25,6 +25,12 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract {
                 ->getFirstItem();
         return $attributeInfo->getId();
     }
+    
+    public function getAttributeCodeFromId($attributeId) {
+        $attribute = Mage::getModel('eav/entity_attribute')
+                ->load($attributeId);
+        return $attribute->getAttributeCode();
+    }
 
     public function getAttributeSetIdFromName($attributeSetName) {
         $entityTypeId = Mage::getModel('eav/entity')
@@ -36,6 +42,21 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract {
                 ->addFieldToFilter('attribute_set_name', $attributeSetName)
                 ->getFirstItem();
         return $attributeSet->getAttributeSetId();
+    }
+    
+    public function getEntityTypeCodeFromId($entityTypeId) {
+        $entityType = Mage::getModel('eav/entity_type')->load($entityTypeId);
+        return $entityType->getEntityTypeCode();
+    }
+
+    public function getEntityTypeIdFromCode($entityTypeCode) {
+        $entityType = Mage::getModel('eav/entity_type')->loadByCode($entityTypeCode);
+        return $entityType->getEntityTypeId();
+    }
+    
+    public function getAttributeSetNameById($attributeSetId) {
+        $attributeSet = Mage::getModel('eav/entity_attribute_set')->load($attributeSetId);
+        return $attributeSet->getAttributeSetName();
     }
 
 }
