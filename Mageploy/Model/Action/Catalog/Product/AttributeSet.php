@@ -5,6 +5,8 @@
  * @author Alessandro Ronchi <aronchi at webgriffe.com>
  */
 class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe_Mageploy_Model_Action_Abstract {
+    
+    const UUID_SEPARATOR = '~';
 
     protected $_code = 'catalog_product_attributeSet';
     
@@ -51,7 +53,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
                 }
             }
             
-            // json_decode $params['data']
+            // json decode $params['data']
             $data = Mage::helper('core')->jsonDecode($params['data']);
             if (isset($data['form_key'])) {
                 unset($params['form_key']);
@@ -73,29 +75,28 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
 
                 $attributeUuid = $helper->getAttributeCodeFromId($attributeId);
                 
-                $entityAttribute = Mage::getResourceModel('eav/entity_attribute_collection')
-                        ->setCodeFilter($attributeUuid)
-                        ->setAttributeGroupFilter($attributeGroupId)
-                        ->getFirstItem();
+                $entityAttribute = $helper->getEntityAttribute($attributeUuid, $attributeGroupId);
                 
                 $attributeSetId = $entityAttribute->getAttributeSetId();
                 $attributeSet = Mage::getModel('eav/entity_attribute_set')->load($attributeSetId);
                 $attributeSetUuid = $attributeSet->getAttributeSetName()
-                        . '~' . $helper->getEntityTypeCodeFromId($attributeSet->getEntityTypeId());
+                        . self::UUID_SEPARATOR . $helper->getEntityTypeCodeFromId($attributeSet->getEntityTypeId());
                 
                 $attributeGroup = Mage::getModel('eav/entity_attribute_group')->load($attributeGroupId);
                 $attributeGroupUuid = $attributeGroup->getAttributeGroupName()
-                        . '~' . $attributeSetUuid;
+                        . self::UUID_SEPARATOR . $attributeSetUuid;
                 
                 $eavAttributeUuid = $helper->getEntityTypeCodeFromId($attributeSet->getEntityTypeId())
-                        . '~' . $attributeSetUuid 
-                        . '~' . $attributeGroupUuid 
-                        . '~' . $attributeUuid;
+                        . self::UUID_SEPARATOR . $attributeSetUuid 
+                        . self::UUID_SEPARATOR . $attributeGroupUuid 
+                        . self::UUID_SEPARATOR . $attributeUuid;
                 
                 // Convert IDs into UUIDs
                 $data['attributes'][$i][0] = $attributeUuid;
                 $data['attributes'][$i][1] = $attributeGroupUuid;
-                $data['attributes'][$i][3] = $eavAttributeUuid;
+                if (!empty($data['attributes'][$i][3])) {
+                    $data['attributes'][$i][3] = $eavAttributeUuid;
+                }
             }
             
             // $data['groups'] contains the following 
@@ -104,17 +105,69 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
             // [0] attribute_group_id or "ynode-NUM" for new
             // [1] attribute_group_name
             // [2] sort_order
+            foreach ($data['groups'] as $i => $group) {
+                $attributeGroupId = $group[0];
+                
+                $attributeGroup = Mage::getModel('eav/entity_attribute_group')->load($attributeGroupId);
+                $attributeSetId = $attributeGroup->getAttributeSetId();
+                $attributeSet = Mage::getModel('eav/entity_attribute_set')->load($attributeSetId);
+                
+                $attributeSetUuid = $attributeSet->getAttributeSetName()
+                        . self::UUID_SEPARATOR . $helper->getEntityTypeCodeFromId($attributeSet->getEntityTypeId());
+                
+                $attributeGroupUuid = $attributeGroup->getAttributeGroupName()
+                        . self::UUID_SEPARATOR . $attributeSetUuid;
+                
+                $data['groups'][$i][0] = $attributeGroupUuid;
+            }
             
             // $data['not_attributes'] contains the ID of attributes to be 
             // unassociated
+            foreach ($data['not_attributes'] as $i => $attributeId) {
+                if (empty($attributeId)) {
+                    continue;
+                }
+                $eavEntityAttributeRow = $helper->getEavEntityAttributeRow($attributeId);
+                
+                $entityTypeCode = $helper->getEntityTypeCodeFromId($eavEntityAttributeRow['entity_type_id']);
+                
+                $attributeSetId = $eavEntityAttributeRow['attribute_set_id'];
+                $attributeSet = Mage::getModel('eav/entity_attribute_set')->load($attributeSetId);
+                $attributeSetUuid = $attributeSet->getAttributeSetName()
+                        . self::UUID_SEPARATOR . $helper->getEntityTypeCodeFromId($attributeSet->getEntityTypeId());
+                
+                $attributeGroupId = $eavEntityAttributeRow['attribute_group_id'];
+                $attributeGroup = Mage::getModel('eav/entity_attribute_group')->load($attributeGroupId);
+                $attributeGroupUuid = $attributeGroup->getAttributeGroupName()
+                        . self::UUID_SEPARATOR . $attributeSetUuid;
+                
+                $attributeUuid = $helper->getAttributeCodeFromId($eavEntityAttributeRow['attribute_id']);
+                
+                $eavEntityAttributeUuid = $entityTypeCode
+                    . self::UUID_SEPARATOR . $attributeSetUuid
+                    . self::UUID_SEPARATOR . $attributeGroupUuid    
+                    . self::UUID_SEPARATOR . $attributeUuid;    
+                
+                $data['not_attributes'][$i] = $eavEntityAttributeUuid;
+            }
             
             // $data['removeGroups'] contains the ID of Attribute Group to be 
             // deleted
+            foreach ($data['removeGroups'] as $i => $groupId) {
+                if (empty($groupId)) {
+                    continue;
+                }
+                $group = Mage::getModel('eav/entity_attribute_group')->load($groupId);
+                $attributeSetId = $group->getAttributeSetId();
+                $attributeSet = Mage::getModel('eav/entity_attribute_set')->load($attributeSetId);
+                $attributeSetUuid = $attributeSet->getAttributeSetName()
+                        . self::UUID_SEPARATOR . $helper->getEntityTypeCodeFromId($attributeSet->getEntityTypeId());
+                $attributeGroupUuid = $attributeSetUuid . self::UUID_SEPARATOR . $group->getAttributeGroupName();
+                $data['removeGroups'][$i] = $attributeGroupUuid;
+            }
             
-            // @todo convert IDs to UUIDs in $params['data']
-            // @todo json_encode $params['data']
-            #$params['data'] = Mage::helper('core')->jsonEncode($data);
-            // @todo The decode() function must do the json encoding
+            // @todo The json encoding is left to the decode() function 
+            // $params['data'] = Mage::helper('core')->jsonEncode($data);
             $params['data'] = $data;
             
             $result[self::INDEX_EXECUTOR_CLASS] = get_class($this);

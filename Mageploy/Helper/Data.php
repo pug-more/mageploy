@@ -25,7 +25,7 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract {
                 ->getFirstItem();
         return $attributeInfo->getId();
     }
-    
+
     public function getAttributeCodeFromId($attributeId) {
         $attribute = Mage::getModel('eav/entity_attribute')
                 ->load($attributeId);
@@ -43,7 +43,7 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract {
                 ->getFirstItem();
         return $attributeSet->getAttributeSetId();
     }
-    
+
     public function getEntityTypeCodeFromId($entityTypeId) {
         $entityType = Mage::getModel('eav/entity_type')->load($entityTypeId);
         return $entityType->getEntityTypeCode();
@@ -53,10 +53,29 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract {
         $entityType = Mage::getModel('eav/entity_type')->loadByCode($entityTypeCode);
         return $entityType->getEntityTypeId();
     }
-    
+
     public function getAttributeSetNameById($attributeSetId) {
         $attributeSet = Mage::getModel('eav/entity_attribute_set')->load($attributeSetId);
         return $attributeSet->getAttributeSetName();
+    }
+
+    public function getEavEntityAttributeRow($entityAttributeId) {
+        $res = Mage::getSingleton('core/resource');
+        $conn = $res->getConnection('core_read');
+        $select = $conn
+                ->select()
+                ->where('entity_attribute_id=?', $entityAttributeId)
+                ->from($res->getTableName('eav/entity_attribute'));
+        return $conn->fetchRow($select);
+    }
+
+    public function getEntityAttribute($attributeCode, $groupId) {
+        $entityAttribute = Mage::getResourceModel('eav/entity_attribute_collection')
+                ->setCodeFilter($attributeCode)
+                ->setAttributeGroupFilter($groupId)
+                ->getFirstItem();
+        
+        return $entityAttribute;
     }
 
 }

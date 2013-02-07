@@ -12,6 +12,11 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
         'status'    => 'Show if there are any changes to be imported',
         'run'       => 'Import changes',
     );
+    
+    private function __getVersion()
+    {
+        return Mage::getConfig()->getNode('modules/PugMoRe_Mageploy/version');
+    }
 
     protected function _construct()
     {
@@ -36,15 +41,17 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     }
 
     public function run() {
+        printf("\r\nMageploy v %s\r\n\r\n", $this->__getVersion());
         if ($this->getArg('status')) {
             $pendingList = $this->_io->getPendingList();
             if (count($pendingList)) {
+                printf("Pending Actions list:\r\n");
                 foreach ($pendingList as $row) {
-                    $actionDescr = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_DESCR];
+                    $actionDescr = '* '.$row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_DESCR];
                     $spacer = str_repeat(" ", 40 - strlen($actionDescr));
                     printf("%s\r\n", $actionDescr);
                 }
-                printf("---\r\nTotal pending actions: %d\r\n", count($pendingList));
+                printf("\r\nTotal pending actions: %d\r\n", count($pendingList));
             } else {
                 printf("There aren't any pending actions to execute.\r\n");
             }
@@ -83,13 +90,15 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                         printf("Error: class '%s' not found!\r\n", $actionExecutorClass);
                     }
                 }
-                printf("---\r\nExecuted actions: %d/%d\r\n", $executed, count($pendingList));
+                printf("\r\nExecuted actions: %d/%d\r\n", $executed, count($pendingList));
             } else {
                 printf("There aren't any pending actions to execute.\r\n");
             }
         } else {
             echo $this->usageHelp();
         }
+        printf("\r\n");
+        
     }
 
     public function usageHelp() {
