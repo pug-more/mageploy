@@ -32,9 +32,9 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract {
         return $attribute->getAttributeCode();
     }
 
-    public function getAttributeSetIdFromName($attributeSetName) {
+    public function getAttributeSetId($attributeSetName, $entityTypeCode) {
         $entityTypeId = Mage::getModel('eav/entity')
-                ->setType('catalog_product')
+                ->setType($entityTypeCode)
                 ->getTypeId();
         $attributeSet = Mage::getModel('eav/entity_attribute_set')
                 ->getCollection()
@@ -42,6 +42,10 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract {
                 ->addFieldToFilter('attribute_set_name', $attributeSetName)
                 ->getFirstItem();
         return $attributeSet->getAttributeSetId();
+    }
+
+    public function getAttributeSetIdFromName($attributeSetName) {
+        return $this->getAttributeSetId($attributeSetName, 'catalog_product');
     }
 
     public function getEntityTypeCodeFromId($entityTypeId) {
@@ -69,13 +73,36 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract {
         return $conn->fetchRow($select);
     }
 
+    public function getEavEntityAttributeId($entityTypeId, $attributeSetId, $attributeGroupId, $attributeId) {
+        $res = Mage::getSingleton('core/resource');
+        $conn = $res->getConnection('core_read');
+        $select = $conn
+                ->select()
+                ->where('entity_type_id=?', $entityTypeId)
+                ->where('attribute_set_id=?', $attributeSetId)
+                ->where('attribute_group_id=?', $attributeGroupId)
+                ->where('attribute_id=?', $attributeId)
+                ->from($res->getTableName('eav/entity_attribute'));
+        $row = $conn->fetchRow($select);
+        return $row['entity_attribute_id'];
+    }
+
     public function getEntityAttribute($attributeCode, $groupId) {
         $entityAttribute = Mage::getResourceModel('eav/entity_attribute_collection')
                 ->setCodeFilter($attributeCode)
                 ->setAttributeGroupFilter($groupId)
                 ->getFirstItem();
-        
+
         return $entityAttribute;
+    }
+
+    public function getAttributeGroupId($attributeSetId, $attributeGroupName) {
+        $attributeGroup = Mage::getResourceModel('eav/entity_attribute_group_collection')
+                ->setAttributeSetFilter($attributeSetId)
+                ->addFieldToFilter('attribute_group_name', $attributeGroupName)
+                ->getFirstItem();
+        
+        return $attributeGroup->getId();
     }
 
 }
