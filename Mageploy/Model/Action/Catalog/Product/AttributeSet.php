@@ -106,7 +106,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
             // [2] sort_order
             foreach ($data['groups'] as $i => $group) {
                 $attributeGroupId = $group[0];
-                
+
                 if (!strncmp($attributeGroupId, 'ynode', strlen('ynode'))) {
                     continue;
                 }
@@ -203,7 +203,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
         $data = $parameters['data'];
 
         // @todo convert UUIDs to IDs in all data array
-        
+
         foreach ($data['attributes'] as $i => $attribute) {
             $attributeUuid = $attribute[0];
             $attributeGroupUuid = $attribute[1];
@@ -211,34 +211,34 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
             list($attributeSetName, $entityTypeCode) = explode(self::UUID_SEPARATOR, $attributeSetUuid);
             $entityTypeId = $helper->getEntityTypeIdFromCode($entityTypeCode);
             $eavAttributeUuid = $attribute[3];
-            
+
             $attributeId = $helper->getAttributeIdFromCode($attributeUuid);
             $attributeSetId = $helper->getAttributeSetId($attributeSetName, $entityTypeCode);
             $attributeGroupId = $helper->getAttributeGroupId($attributeSetId, $attributeGroupName);
             #$entityAttribute = $helper->getEntityAttribute($attributeUuid, $attributeGroupId);
-            
+
             $eavAttributeId = $helper->getEavEntityAttributeId($entityTypeId, $attributeSetId, $attributeGroupId, $attributeId);
-            
+
             $data['attributes'][$i][0] = $attributeId;
             $data['attributes'][$i][1] = $attributeGroupId;
             $data['attributes'][$i][3] = $eavAttributeId;
-            
+
             $a = $b;
         }
-        
+
         foreach ($data['groups'] as $i => $group) {
             $attributeGroupUuid = $group[0];
             if (!strncmp($attributeGroupUuid, 'ynode', strlen('ynode'))) {
                 continue;
-            }            
-            
+            }
+
             list($attributeGroupName, $attributeSetUuid) = explode(self::UUID_SEPARATOR, $attributeGroupUuid, 2);
             list($attributeSetName, $entityTypeCode) = explode(self::UUID_SEPARATOR, $attributeSetUuid);
             $attributeSetId = $helper->getAttributeSetId($attributeSetName, $entityTypeCode);
             $attributeGroupId = $helper->getAttributeGroupId($attributeSetId, $attributeGroupName);
             $data['groups'][$i][0] = $attributeGroupId;
         }
-        
+
         foreach ($data['not_attributes'] as $i => $eavAttributeUuid) {
             if (empty($eavAttributeUuid)) {
                 continue;
@@ -248,17 +248,27 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
             $attributeSetName = $parts[1];
             $attributeGroupName = $parts[3];
             $attributeCode = $parts[6];
-            
+
             $entityTypeId = $helper->getEntityTypeIdFromCode($entityTypeCode);
             $attributeSetId = $helper->getAttributeSetId($attributeSetName, $entityTypeCode);
-            $attributeGroupId = $helper->getAttributeGroupId($attributeSetId, $attributeGroupName);;
+            $attributeGroupId = $helper->getAttributeGroupId($attributeSetId, $attributeGroupName);
+            ;
             $attributeId = $helper->getAttributeIdFromCode($attributeCode);
-            
+
             $entityAttributeId = $helper->getEavEntityAttributeId($entityTypeId, $attributeSetId, $attributeGroupId, $attributeId);
             $data['not_attributes'][$i] = $entityAttributeId;
         }
-        
-        
+
+        foreach ($data['removeGroups'] as $i => $groupUuid) {
+            if (empty($groupUuid)) {
+                continue;
+            }
+            list ($attributeGroupName, $attributeSetName, $entityTypeCode) = explode($groupUuid);
+            $attributeSetId = $helper->getAttributeSetId($attributeSetName, $entityTypeCode);
+            $groupId = $helper->getAttributeGroupId($attributeSetId, $attributeGroupName);
+            $data['removeGroups'][$i] = $groupId;
+        }
+
         // json encode data array
         $parameters['data'] = Mage::helper('core')->jsonEncode($data);
 
