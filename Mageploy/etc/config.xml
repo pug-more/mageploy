@@ -35,6 +35,7 @@
     </adminhtml>
     
     <default>
+        <!-- Use this section to register custom Action Trackers -->
         <mageploy>
             <actions>
                 <catalog_product_attribute>
@@ -47,5 +48,12 @@
                 </catalog_product_attributeSet>
             </actions>
         </mageploy>
+        
+        <!-- System Configuration default values -->
+        <dev>
+            <mageploy>
+                <active>1</active>
+            </mageploy>
+        </dev>
     </default>
 </config>

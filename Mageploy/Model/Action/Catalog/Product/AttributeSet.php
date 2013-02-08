@@ -10,7 +10,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
     const UUID_SEPARATOR = '~';
 
     protected $_code = 'catalog_product_attributeSet';
-    protected $_blankableParams = array('id', 'key', 'isAjax', 'gotoEdit', 'form_key');
+    protected $_blankableParams = array('id', 'key', 'isAjax', 'form_key');
 
     public function match() {
         if (!$this->_request) {
@@ -45,6 +45,11 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
                 $params['mageploy_uuid'] = $attributeSet->getAttributeSetName();
                 $newOrExisting = 'existing';
             }
+            
+            if (isset($params['skeleton_set'])) {
+                $skeletonSet = Mage::getModel('eav/entity_attribute_set')->load($params['skeleton_set']);
+                $params['skeleton_set'] = $skeletonSet->getAttributeSetName();
+            }            
 
             foreach ($this->_blankableParams as $key) {
                 if (isset($params[$key])) {
@@ -81,9 +86,13 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
                 $attributeSetUuid = $attributeSet->getAttributeSetName()
                         . self::UUID_SEPARATOR . $helper->getEntityTypeCodeFromId($attributeSet->getEntityTypeId());
 
-                $attributeGroup = Mage::getModel('eav/entity_attribute_group')->load($attributeGroupId);
-                $attributeGroupUuid = $attributeGroup->getAttributeGroupName()
-                        . self::UUID_SEPARATOR . $attributeSetUuid;
+                if (!strncmp($attributeGroupId, 'ynode', strlen('ynode'))) {
+                    $attributeGroupUuid = $attributeGroupId;
+                } else {
+                    $attributeGroup = Mage::getModel('eav/entity_attribute_group')->load($attributeGroupId);
+                    $attributeGroupUuid = $attributeGroup->getAttributeGroupName()
+                            . self::UUID_SEPARATOR . $attributeSetUuid;
+                }
 
                 $eavAttributeUuid = $helper->getEntityTypeCodeFromId($attributeSet->getEntityTypeId())
                         . self::UUID_SEPARATOR . $attributeSetUuid
@@ -199,31 +208,40 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
         if ($attributeSetId = $helper->getAttributeSetIdFromName($attributeSetName)) {
             $parameters['id'] = $attributeSetId;
         }
+        
+        $skeletonSetName = $parameters['skeleton_set'];
+        if ($skeletonSetId = $helper->getAttributeSetIdFromName($skeletonSetName)) {
+            $parameters['skeleton_set'] = $skeletonSetId;
+        }
 
         $data = $parameters['data'];
-
-        // @todo convert UUIDs to IDs in all data array
-
+        
         foreach ($data['attributes'] as $i => $attribute) {
-            $attributeUuid = $attribute[0];
             $attributeGroupUuid = $attribute[1];
+            if (!strncmp($attributeGroupUuid, 'ynode', strlen('ynode'))) {
+                continue;
+            }
+            $attributeUuid = $attribute[0];
+            
             list($attributeGroupName, $attributeSetUuid) = explode(self::UUID_SEPARATOR, $attributeGroupUuid, 2);
             list($attributeSetName, $entityTypeCode) = explode(self::UUID_SEPARATOR, $attributeSetUuid);
             $entityTypeId = $helper->getEntityTypeIdFromCode($entityTypeCode);
             $eavAttributeUuid = $attribute[3];
 
-            $attributeId = $helper->getAttributeIdFromCode($attributeUuid);
+            $attributeId = $helper->getAttributeIdFromCode($attributeUuid, $entityTypeId);
             $attributeSetId = $helper->getAttributeSetId($attributeSetName, $entityTypeCode);
+            
             $attributeGroupId = $helper->getAttributeGroupId($attributeSetId, $attributeGroupName);
-            #$entityAttribute = $helper->getEntityAttribute($attributeUuid, $attributeGroupId);
-
             $eavAttributeId = $helper->getEavEntityAttributeId($entityTypeId, $attributeSetId, $attributeGroupId, $attributeId);
+            #$entityAttribute = $helper->getEntityAttribute($attributeUuid, $attributeGroupId);
 
             $data['attributes'][$i][0] = $attributeId;
             $data['attributes'][$i][1] = $attributeGroupId;
-            $data['attributes'][$i][3] = $eavAttributeId;
-
-            $a = $b;
+            if ($eavAttributeId) {
+                $data['attributes'][$i][3] = $eavAttributeId;
+            } else {
+                $data['attributes'][$i][3] = '';
+            }
         }
 
         foreach ($data['groups'] as $i => $group) {
@@ -252,8 +270,8 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
             $entityTypeId = $helper->getEntityTypeIdFromCode($entityTypeCode);
             $attributeSetId = $helper->getAttributeSetId($attributeSetName, $entityTypeCode);
             $attributeGroupId = $helper->getAttributeGroupId($attributeSetId, $attributeGroupName);
-            ;
-            $attributeId = $helper->getAttributeIdFromCode($attributeCode);
+
+            $attributeId = $helper->getAttributeIdFromCode($attributeCode, $entityTypeId);
 
             $entityAttributeId = $helper->getEavEntityAttributeId($entityTypeId, $attributeSetId, $attributeGroupId, $attributeId);
             $data['not_attributes'][$i] = $entityAttributeId;

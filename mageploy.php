@@ -9,8 +9,9 @@ if (file_exists('abstract.php')) {
 class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
 
     protected $_options = array(
-        'status'    => 'Show if there are any changes to be imported',
-        'run'       => 'Import changes',
+        'track <val>'   => '0 to disable tracking, any other value to enable it',
+        'status'        => 'Show if there are any changes to be imported',
+        'run <id>'      => 'Import changes for specified action (may cause inconsistencies); import all changes with blank id ',
     );
     
     private function __getVersion()
@@ -41,25 +42,46 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     }
 
     public function run() {
-        printf("\r\nMageploy v %s\r\n\r\n", $this->__getVersion());
+        $helper = Mage::helper('pugmore_mageploy');
+
+        $track = $this->getArg('track');
+        if ($track !== false) {
+            if (!strcmp('0', $track)) {
+                $doTracking = $helper->disable();
+            } else {
+                $doTracking = $helper->enable(); 
+            }
+        } else {
+            $doTracking = $helper->isActive();
+        }
+        
         if ($this->getArg('status')) {
+            $this->_printHeader($doTracking);
+            
             $pendingList = $this->_io->getPendingList();
             if (count($pendingList)) {
                 printf("Pending Actions list:\r\n");
-                foreach ($pendingList as $row) {
-                    $actionDescr = '* '.$row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_DESCR];
-                    $spacer = str_repeat(" ", 40 - strlen($actionDescr));
+                foreach ($pendingList as $i => $row) {
+                    $actionDescr = sprintf("ID: %d\t - %s", ($i+1), $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_DESCR]);
+                    
+                    $spacer = str_repeat(" ", max(0, 40 - strlen($actionDescr)));
                     printf("%s\r\n", $actionDescr);
                 }
                 printf("\r\nTotal pending actions: %d\r\n", count($pendingList));
             } else {
                 printf("There aren't any pending actions to execute.\r\n");
             }
-        } else if ($this->getArg('run')) {
+        } else if ($id = $this->getArg('run')) {
+            $this->_printHeader($doTracking);
+            
             $pendingList = $this->_io->getPendingList();
             if (count($pendingList)) {
                 $executed = 0;
-                foreach ($pendingList as $row) {
+                
+                foreach ($pendingList as $i => $row) {
+                    if (($id > 0) && ($i+1 != $id)) {
+                        continue;
+                    }
                     $actionExecutorClass = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_EXECUTOR_CLASS];
                     $controllerModule = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_CONTROLLER_MODULE];
                     $controllerName = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_CONTROLLER_NAME];
@@ -95,18 +117,26 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                 printf("There aren't any pending actions to execute.\r\n");
             }
         } else {
-            echo $this->usageHelp();
+            echo $this->usageHelp($doTracking);
         }
         printf("\r\n");
         
     }
 
-    public function usageHelp() {
-        $help = "\r\nUsage:\tphp mageploy.php --[options]\r\n\r\n";
+    public function usageHelp($isActive) {
+        $this->_printHeader($isActive);
+        
+        $help = "Usage:\tphp mageploy.php --[options]\r\n\r\n";
         foreach ($this->_options as $option => $description) {
             $help .= "--$option".  str_repeat(" ", 20 - strlen($option))."$description\r\n";
         }
         return $help."\r\n";
+    }
+    
+    protected function _printHeader($isActive)
+    {
+        $active = $isActive ? '' : 'not ';
+        printf("\r\nMageploy v %s (tracking is %sactive)\r\n\r\n", $this->__getVersion(), $active);
     }
 
 }

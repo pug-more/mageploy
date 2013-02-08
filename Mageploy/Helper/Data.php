@@ -6,6 +6,28 @@
  * @author Alessandro Ronchi <aronchi at webgriffe.com>
  */
 class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract {
+    
+    public function isActive() {
+        return Mage::getStoreConfigFlag('dev/mageploy/active');
+    }
+    
+    private function __setActiveFlag($value) {
+        $config = Mage::getModel('core/config');
+        $config->saveConfig('dev/mageploy/active', $value);
+    }
+    
+    public function disable() {
+        $this->__setActiveFlag(0);
+        return false;
+    }
+    
+    public function enable() {
+        $this->__setActiveFlag(1);
+        return true;
+    }
+    
+    
+           
 
     public function getStoragePath() {
         return Mage::getBaseDir() . DS . 'var' . DS . 'log' . DS;
@@ -19,9 +41,10 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract {
         return 'mageploy_all.csv';
     }
 
-    public function getAttributeIdFromCode($attributeCode) {
+    public function getAttributeIdFromCode($attributeCode, $entityTypeId) {
         $attributeInfo = Mage::getResourceModel('eav/entity_attribute_collection')
                 ->setCodeFilter($attributeCode)
+                ->setEntityTypeFilter($entityTypeId)
                 ->getFirstItem();
         return $attributeInfo->getId();
     }
