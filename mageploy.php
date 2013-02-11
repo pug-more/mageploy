@@ -82,6 +82,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                     if (($id > 0) && ($i+1 != $id)) {
                         continue;
                     }
+                    
                     $actionExecutorClass = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_EXECUTOR_CLASS];
                     $controllerModule = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_CONTROLLER_MODULE];
                     $controllerName = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_CONTROLLER_NAME];
@@ -111,6 +112,11 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                     } else {
                         printf("Error: class '%s' not found!\r\n", $actionExecutorClass);
                     }
+                    // Yes, PHP is Object Oriented but don't forget the 
+                    // Superglobals! After all it's not Java :-)
+                    $_GET = array();
+                    $_POST = array();
+                    $_REQUEST = array();
                 }
                 printf("\r\nExecuted actions: %d/%d\r\n", $executed, count($pendingList));
             } else {
