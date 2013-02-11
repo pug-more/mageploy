@@ -135,8 +135,8 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     
     protected function _printHeader($isActive)
     {
-        $active = $isActive ? '' : 'not ';
-        printf("\r\nMageploy v %s (tracking is %sactive)\r\n\r\n", $this->__getVersion(), $active);
+        $active = $isActive ? "\033[0;32mtracking is active\033[0m " : "\033[0;31mtracking is not active\033[0m ";
+        printf("\r\nMageploy v %s - %s\r\n\r\n", $this->__getVersion(), $active);
     }
 
 }
