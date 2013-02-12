@@ -78,6 +78,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
             if (count($pendingList)) {
                 $executed = 0;
                 
+                $session = Mage::getSingleton('adminhtml/session');
                 foreach ($pendingList as $i => $row) {
                     if (($id > 0) && ($i+1 != $id)) {
                         continue;
@@ -103,6 +104,14 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                             $controller->preDispatch();
                             $controller->$action();
                             $controller->postDispatch();
+                            
+                            $messages = $session->getMessages(clear);
+                            foreach ($messages->getItems() as $message) {
+                                $color = $message->getType() == 'error' ? "31" : "32";
+                                
+                                printf("Action ID #%d - \033[0;%sm%s:\033[0m %s\r\n", ($i+1), $color, $message->getType(), $message->getText());
+                            }
+                            
                             $executed ++;
                             // register executed action
                             $this->_io->done($row);
