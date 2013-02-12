@@ -75,7 +75,6 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
         }
         
         $request = new Mage_Core_Controller_Request_Http();
-        #$request->setParams($parameters);
         $request->setPost($parameters);
         $request->setQuery($parameters);
         return $request;

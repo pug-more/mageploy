@@ -38,6 +38,10 @@
         <!-- Use this section to register custom Action Trackers -->
         <mageploy>
             <actions>
+                <system_config>
+                    <disabled>0</disabled>
+                    <class>PugMoRe_Mageploy_Model_Action_System_Config</class>
+                </system_config>
                 <catalog_product_attribute>
                     <disabled>0</disabled>
                     <class>PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute</class>
@@ -53,6 +57,7 @@
         <dev>
             <mageploy>
                 <active>1</active>
+                <debug>1</debug>
             </mageploy>
         </dev>
     </default>

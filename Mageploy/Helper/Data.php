@@ -7,13 +7,20 @@
  */
 class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract {
     
-    public function isActive() {
-        return Mage::getStoreConfigFlag('dev/mageploy/active');
-    }
-    
     private function __setActiveFlag($value) {
         $config = Mage::getModel('core/config');
         $config->saveConfig('dev/mageploy/active', $value);
+    }
+    
+    public function log($msg) {
+        $args = func_get_args();
+        $formattedMsg = call_user_func_array('sprintf', $args);
+        Mage::log($formattedMsg, null, 'PugMoRe_Mageploy.log', Mage::getStoreConfigFlag('dev/mageploy/debug'));
+    }
+            
+    
+    public function isActive() {
+        return Mage::getStoreConfigFlag('dev/mageploy/active');
     }
     
     public function disable() {
@@ -25,12 +32,9 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract {
         $this->__setActiveFlag(1);
         return true;
     }
-    
-    
-           
 
     public function getStoragePath() {
-        return Mage::getBaseDir() . DS . 'var' . DS . 'log' . DS;
+        return Mage::getBaseDir() . DS . 'var' . DS . 'mageploy' . DS;
     }
 
     public function getExecutedActionsFilename() {

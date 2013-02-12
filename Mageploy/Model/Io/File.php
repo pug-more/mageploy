@@ -13,6 +13,11 @@ class PugMoRe_Mageploy_Model_Io_File {
     public function __construct()
     {
         $this->_helper = Mage::helper('pugmore_mageploy');
+        
+        if (!is_dir($this->_helper->getStoragePath())) {
+            mkdir($this->_helper->getStoragePath(), 0755, true)
+                or die(sprintf("Can't create folder '%s'", $this->_helper->getStoragePath()));
+        }
 
         $this->_todo = fopen($this->_helper->getStoragePath().$this->_helper->getAllActionsFilename(), 'a')
             or die(sprintf("Can't open file '%s'", $this->_helper->getAllActionsFilename()));
@@ -47,9 +52,8 @@ class PugMoRe_Mageploy_Model_Io_File {
             foreach ( array_diff ($todo, $done) as $k=>$v) {
                 $pendingList[$k] = $todoList[$k];
             }
-            #print_r($pendingList);
         } catch (Exception $e) {
-            Mage::log($e->getMessage(), null, 'mageploy.log', true);
+            $this->_helper->log($e->getMessage());
         }
         return $pendingList;
 

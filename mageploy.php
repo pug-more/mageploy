@@ -9,19 +9,45 @@ if (file_exists('abstract.php')) {
 class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
 
     protected $_options = array(
-        'track <val>'   => '0 to disable tracking, any other value to enable it',
-        'status'        => 'Show if there are any changes to be imported',
-        'run <id>'      => 'Import changes for specified action (may cause inconsistencies); import all changes with blank id ',
+        'track <val>' => '0 to disable tracking, any other value to enable it',
+        'status' => 'Show if there are any changes to be imported',
+        'run <id>' => 'Import changes for specified action (may cause inconsistencies); import all changes with blank id ',
     );
-    
-    private function __getVersion()
-    {
+
+    private function __getVersion() {
         return Mage::getConfig()->getNode('modules/PugMoRe_Mageploy/version');
     }
 
-    protected function _construct()
-    {
+    protected function _initSession() {
+        $userModel = Mage::getModel('admin/user');
+        $userModel->setUserId(0);
+        Mage::getSingleton('admin/session')->setUser($userModel);        
+        /*
+        $session = Mage::getSingleton('admin/session');
+        try {
+            $user = Mage::getModel('admin/user');
+            $user->login('admin_username', 'admin_password');
+            if ($user->getId()) {
+                $session->renewSession();
+
+                if (Mage::getSingleton('adminhtml/url')->useSecretKey()) {
+                    Mage::getSingleton('adminhtml/url')->renewSecretUrls();
+                }
+                $session->setIsFirstPageAfterLogin(true);
+                $session->setUser($user);
+                $session->setAcl(Mage::getResourceModel('admin/acl')->loadAcl());
+            } else {
+                Mage::throwException(Mage::helper('adminhtml')->__('Invalid User Name or Password.'));
+            }
+        } catch (Mage_Core_Exception $e) {
+            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+        }
+        */
+    }
+
+    protected function _construct() {
         $this->_io = new PugMoRe_Mageploy_Model_Io_File();
+        $this->_initSession('admin', 'p4ssw0rd');
         return parent::_construct();
     }
 
@@ -35,9 +61,8 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
         return $file;
     }
 
-    public function _getControllerClassName($controllerModule, $controllerName)
-    {
-        $class = $controllerModule.'_'.uc_words($controllerName).'Controller';
+    public function _getControllerClassName($controllerModule, $controllerName) {
+        $class = $controllerModule . '_' . uc_words($controllerName) . 'Controller';
         return $class;
     }
 
@@ -49,21 +74,21 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
             if (!strcmp('0', $track)) {
                 $doTracking = $helper->disable();
             } else {
-                $doTracking = $helper->enable(); 
+                $doTracking = $helper->enable();
             }
         } else {
             $doTracking = $helper->isActive();
         }
-        
+
         if ($this->getArg('status')) {
             $this->_printHeader($doTracking);
-            
+
             $pendingList = $this->_io->getPendingList();
             if (count($pendingList)) {
                 printf("Pending Actions list:\r\n");
                 foreach ($pendingList as $i => $row) {
-                    $actionDescr = sprintf("ID: %d\t - %s", ($i+1), $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_DESCR]);
-                    
+                    $actionDescr = sprintf("ID: %d\t - %s", ($i + 1), $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_DESCR]);
+
                     $spacer = str_repeat(" ", max(0, 40 - strlen($actionDescr)));
                     printf("%s\r\n", $actionDescr);
                 }
@@ -73,17 +98,17 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
             }
         } else if ($id = $this->getArg('run')) {
             $this->_printHeader($doTracking);
-            
+
             $pendingList = $this->_io->getPendingList();
             if (count($pendingList)) {
                 $executed = 0;
-                
+
                 $session = Mage::getSingleton('adminhtml/session');
                 foreach ($pendingList as $i => $row) {
-                    if (($id > 0) && ($i+1 != $id)) {
+                    if (($id > 0) && ($i + 1 != $id)) {
                         continue;
                     }
-                    
+
                     $actionExecutorClass = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_EXECUTOR_CLASS];
                     $controllerModule = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_CONTROLLER_MODULE];
                     $controllerName = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_CONTROLLER_NAME];
@@ -100,19 +125,19 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                             $parameters = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_PARAMS];
                             $request = $actionExecutor->decode($parameters);
                             $controller = new $controllerClassName($request, new Mage_Core_Controller_Response_Http());
-                            $action = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_NAME].'Action';
+                            $action = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_NAME] . 'Action';
                             $controller->preDispatch();
                             $controller->$action();
                             $controller->postDispatch();
-                            
+
                             $messages = $session->getMessages(clear);
                             foreach ($messages->getItems() as $message) {
                                 $color = $message->getType() == 'error' ? "31" : "32";
-                                
-                                printf("Action ID #%d - \033[0;%sm%s:\033[0m %s\r\n", ($i+1), $color, $message->getType(), $message->getText());
+
+                                printf("Action ID #%d - \033[0;%sm%s:\033[0m %s\r\n", ($i + 1), $color, $message->getType(), $message->getText());
                             }
-                            
-                            $executed ++;
+
+                            $executed++;
                             // register executed action
                             $this->_io->done($row);
                         } else {
@@ -122,7 +147,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                         printf("Error: class '%s' not found!\r\n", $actionExecutorClass);
                     }
                     // Yes, PHP is Object Oriented but don't forget the 
-                    // Superglobals! After all it's not Java :-)
+                    // Superglobals! After all PHP is not Java :-)
                     $_GET = array();
                     $_POST = array();
                     $_REQUEST = array();
@@ -135,21 +160,19 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
             echo $this->usageHelp($doTracking);
         }
         printf("\r\n");
-        
     }
 
     public function usageHelp($isActive) {
         $this->_printHeader($isActive);
-        
+
         $help = "Usage:\tphp mageploy.php --[options]\r\n\r\n";
         foreach ($this->_options as $option => $description) {
-            $help .= "--$option".  str_repeat(" ", 20 - strlen($option))."$description\r\n";
+            $help .= "--$option" . str_repeat(" ", 20 - strlen($option)) . "$description\r\n";
         }
-        return $help."\r\n";
+        return $help . "\r\n";
     }
-    
-    protected function _printHeader($isActive)
-    {
+
+    protected function _printHeader($isActive) {
         $active = $isActive ? "\033[0;32mtracking is active\033[0m " : "\033[0;31mtracking is not active\033[0m ";
         printf("\r\nMageploy v %s - %s\r\n\r\n", $this->__getVersion(), $active);
     }

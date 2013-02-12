@@ -293,8 +293,6 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
         $parameters['data'] = Zend_Json::encode($data);
 
         $request = new Mage_Core_Controller_Request_Http();
-        Mage::log(sprintf('$parameters %s', print_r($parameters, true)), null, 'mageploy.log', true);
-        #$request->setParams($parameters);
         $request->setPost($parameters);
         $request->setQuery($parameters);
         return $request;
