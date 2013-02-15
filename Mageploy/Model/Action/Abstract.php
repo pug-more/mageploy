@@ -5,12 +5,14 @@
  * @author Alessandro Ronchi <aronchi at webgriffe.com>
  */
 abstract class PugMoRe_Mageploy_Model_Action_Abstract {
-    const INDEX_EXECUTOR_CLASS      = 0;
-    const INDEX_CONTROLLER_MODULE   = 1;
-    const INDEX_CONTROLLER_NAME     = 2;
-    const INDEX_ACTION_NAME         = 3;
-    const INDEX_ACTION_PARAMS       = 4;
-    const INDEX_ACTION_DESCR        = 5;
+    const INDEX_ACTION_TIMESTAMP    = 0;
+    const INDEX_ACTION_USER         = 1;
+    const INDEX_ACTION_DESCR        = 2;
+    const INDEX_EXECUTOR_CLASS      = 3;
+    const INDEX_CONTROLLER_MODULE   = 4;
+    const INDEX_CONTROLLER_NAME     = 5;
+    const INDEX_ACTION_NAME         = 6;
+    const INDEX_ACTION_PARAMS       = 7;
     
     protected $_code = '';
     
@@ -28,9 +30,19 @@ abstract class PugMoRe_Mageploy_Model_Action_Abstract {
         return $this;
     }
     
-    public abstract function match();
+    public function match() {
+        return false;
+    }
 
-    public abstract function encode();
+    public function encode() {
+        $result = array(
+            self::INDEX_ACTION_TIMESTAMP => time(),
+            self::INDEX_ACTION_USER => Mage::helper('pugmore_mageploy')->getUser(),
+        );
+        return $result;
+    }
     
-    public abstract function decode($serializedParameters);
+    public function decode($serializedParameters) {
+        
+    }
 }

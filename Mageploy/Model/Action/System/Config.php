@@ -27,7 +27,8 @@ class PugMoRe_Mageploy_Model_Action_System_Config extends PugMoRe_Mageploy_Model
     }
 
     public function encode() {
-        $result = array();
+        $result = parent::encode();
+        
         if ($this->_request) {
             $params = $this->_request->getParams();
 
@@ -36,6 +37,12 @@ class PugMoRe_Mageploy_Model_Action_System_Config extends PugMoRe_Mageploy_Model
                     unset($params[$key]);
                 }
             }
+            
+            // Prevent propagating changes on user identifier
+            if (isset($params['groups']['mageploy']['fields']['user'])) {
+                unset($params['groups']['mageploy']['fields']['user']);
+            }
+            
             $result[self::INDEX_EXECUTOR_CLASS] = get_class($this);
             #$result[self::INDEX_CONTROLLER_MODULE] = $this->_request->getControllerModule();
             $result[self::INDEX_CONTROLLER_MODULE] = 'PugMoRe_Mageploy';

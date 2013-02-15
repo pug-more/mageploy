@@ -7,12 +7,23 @@ if (file_exists('abstract.php')) {
 }
 
 class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
+    
+    const TERM_COLOR_RED    = '31m';
+    const TERM_COLOR_GREEN  = '32m';
+    const TERM_COLOR_YELLOW = '33m';
+    
 
     protected $_options = array(
         'track <val>' => '0 to disable tracking, any other value to enable it',
         'status' => 'Show if there are any changes to be imported',
         'run <id>' => 'Import changes for specified action (may cause inconsistencies); import all changes with blank id ',
     );
+    
+    private function __getColoredString($str, $color = null) {
+        if (is_null($color)) return $str;
+        
+        return sprintf("\033[0;%s%s\033[0m", $color, $str);
+    }
 
     private function __getVersion() {
         return Mage::getConfig()->getNode('modules/PugMoRe_Mageploy/version');
@@ -87,7 +98,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
             if (count($pendingList)) {
                 printf("Pending Actions list:\r\n");
                 foreach ($pendingList as $i => $row) {
-                    $actionDescr = sprintf("ID: %d\t - %s", ($i + 1), $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_DESCR]);
+                    $actionDescr = sprintf("ID: %d\t - %s (%s on %s)", ($i + 1), $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_DESCR], $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_USER], strftime("%c", $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_TIMESTAMP]));
 
                     $spacer = str_repeat(" ", max(0, 40 - strlen($actionDescr)));
                     printf("%s\r\n", $actionDescr);
@@ -132,9 +143,9 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
 
                             $messages = $session->getMessages(clear);
                             foreach ($messages->getItems() as $message) {
-                                $color = $message->getType() == 'error' ? "31" : "32";
+                                $color = $message->getType() == 'error' ? self::TERM_COLOR_RED : self::TERM_COLOR_GREEN;
 
-                                printf("Action ID #%d - \033[0;%sm%s:\033[0m %s\r\n", ($i + 1), $color, $message->getType(), $message->getText());
+                                printf("Action ID #%d - %s %s\r\n", ($i + 1), $this->__getColoredString($message->getType(), $color), $message->getText());
                             }
 
                             $executed++;
@@ -173,8 +184,12 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     }
 
     protected function _printHeader($isActive) {
-        $active = $isActive ? "\033[0;32mtracking is active\033[0m " : "\033[0;31mtracking is not active\033[0m ";
-        printf("\r\nMageploy v %s - %s\r\n\r\n", $this->__getVersion(), $active);
+        $active = $isActive 
+            ? $this->__getColoredString("tracking is active", self::TERM_COLOR_GREEN)
+            : $this->__getColoredString("tracking is not active", self::TERM_COLOR_RED);
+        $user = Mage::helper('pugmore_mageploy')->getUser();
+        $user = $this->__getColoredString("user is " . $user, !strcmp('anonymous', $user) ? self::TERM_COLOR_YELLOW : self::TERM_COLOR_GREEN);
+        printf("\r\nMageploy v %s - %s - %s\r\n\r\n", $this->__getVersion(), $active, $user);
     }
 
 }

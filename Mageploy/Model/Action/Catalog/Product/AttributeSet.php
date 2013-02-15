@@ -37,7 +37,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
     }
 
     public function encode() {
-        $result = array();
+        $result = parent::encode();
 
         if ($this->_request) {
             $params = $this->_request->getParams();

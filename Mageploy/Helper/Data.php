@@ -36,6 +36,10 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract {
     public function getStoragePath() {
         return Mage::getBaseDir() . DS . 'var' . DS . 'mageploy' . DS;
     }
+    
+    public function getUser() {
+        return Mage::getStoreConfig('dev/mageploy/user');
+    }
 
     public function getExecutedActionsFilename() {
         return 'mageploy_executed.csv';

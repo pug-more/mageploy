@@ -31,6 +31,15 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </debug>
+                        <user translate="label,comment">
+                            <label>Specific User Identifier</label>
+                            <comment>This value can be used to identify which user performed each action.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </user>
                     </fields>
                 </mageploy>
             </groups>

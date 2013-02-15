@@ -58,6 +58,7 @@
             <mageploy>
                 <active>1</active>
                 <debug>1</debug>
+                <user>anonymous</user>
             </mageploy>
         </dev>
     </default>

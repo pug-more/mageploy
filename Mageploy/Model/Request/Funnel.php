@@ -61,7 +61,9 @@ class PugMoRe_Mageploy_Model_Request_Funnel {
         Varien_Profiler::start('mageploy::funnel::record_action');
         
         Mage::helper('pugmore_mageploy')->log("Should record '%s'", $action->toString());
-        $this->_io->record($action->encode());
+        $result = $action->encode();
+        ksort($result);
+        $this->_io->record($result);
         
         Varien_Profiler::stop('mageploy::funnel::record_action');
 
