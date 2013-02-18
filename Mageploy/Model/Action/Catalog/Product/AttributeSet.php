@@ -7,8 +7,6 @@
  */
 class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe_Mageploy_Model_Action_Abstract {
 
-    const UUID_SEPARATOR = '~';
-
     protected $_code = 'catalog_product_attributeSet';
     protected $_blankableParams = array('id', 'key', 'isAjax', 'form_key');
 

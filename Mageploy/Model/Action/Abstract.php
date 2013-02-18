@@ -14,6 +14,8 @@ abstract class PugMoRe_Mageploy_Model_Action_Abstract {
     const INDEX_ACTION_NAME         = 6;
     const INDEX_ACTION_PARAMS       = 7;
     
+    const UUID_SEPARATOR = '~';
+    
     protected $_code = '';
     
     /*
