@@ -141,7 +141,18 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                             $controller->$action();
                             $controller->postDispatch();
 
-                            $messages = $session->getMessages(clear);
+                            if (isset($parameters['isAjax']) && $parameters['isAjax']) {
+                                $messages = new Mage_Core_Model_Message_Collection();
+                                $body = $controller->getResponse()->getBody();
+                                if ($body == 'SUCCESS') {
+                                    $msg = Mage::getSingleton('core/message')->success($body);
+                                } else {
+                                    $msg = Mage::getSingleton('core/message')->error($body);
+                                }
+                                $messages->add($msg);
+                            } else {
+                                $messages = $session->getMessages(clear);
+                            }
                             foreach ($messages->getItems() as $message) {
                                 $color = $message->getType() == 'error' ? self::TERM_COLOR_RED : self::TERM_COLOR_GREEN;
 

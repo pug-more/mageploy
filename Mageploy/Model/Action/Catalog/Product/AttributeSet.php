@@ -8,7 +8,7 @@
 class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe_Mageploy_Model_Action_Abstract {
 
     protected $_code = 'catalog_product_attributeSet';
-    protected $_blankableParams = array('id', 'key', 'isAjax', 'form_key');
+    protected $_blankableParams = array('id', 'key', /*'isAjax',*/ 'form_key');
 
     protected function _getEntityTypeCode() {
         return Mage_Catalog_Model_Product::ENTITY;
