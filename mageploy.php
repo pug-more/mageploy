@@ -14,9 +14,9 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     
 
     protected $_options = array(
-        'track <val>' => '0 to disable tracking, any other value to enable it',
+        'track [val]' => '0 to disable tracking, any other value or blank to enable it',
         'status' => 'Show if there are any changes to be imported',
-        'run <id>' => 'Import changes for specified action (may cause inconsistencies); import all changes with blank id ',
+        'run [id]' => 'Import changes for specified action (not recommended); leave id blank to import all',
     );
     
     private function __getColoredString($str, $color = null) {
