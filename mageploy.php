@@ -14,9 +14,10 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     
 
     protected $_options = array(
-        'track [val]' => '0 to disable tracking, any other value or blank to enable it',
-        'status' => 'Show if there are any changes to be imported',
-        'run [id]' => 'Import changes for specified action (not recommended); leave id blank to import all',
+        'track [val]'   => '0 to disable tracking, any other value or blank to enable it',
+        'history [n]'   => 'Show the last n changes. Leave n blank to show all',
+        'status'        => 'Show if there are any changes to be imported',
+        'run [id]'      => 'Import changes for specified action (not recommended); leave id blank to import all',
     );
     
     private function __getColoredString($str, $color = null) {
@@ -107,6 +108,23 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
             } else {
                 printf("There aren't any pending actions to execute.\r\n");
             }
+        } else if ($limit = $this->getArg('history')) {
+            $this->_printHeader($doTracking);
+
+            $historyList = $this->_io->getHistoryList($limit);
+            if (count($historyList)) {
+                printf("Global Actions list:\r\n");
+                foreach ($historyList as $i => $row) {
+                    $actionDescr = sprintf("ID: %d\t - %s (%s on %s)", ($i + 1), $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_DESCR], $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_USER], strftime("%c", $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_TIMESTAMP]));
+
+                    $spacer = str_repeat(" ", max(0, 40 - strlen($actionDescr)));
+                    printf("%s\r\n", $actionDescr);
+                }
+                printf("\r\nTotal global actions listed: %d\r\n", count($historyList));
+            } else {
+                printf("There aren't any pending actions to execute.\r\n");
+            }
+            
         } else if ($id = $this->getArg('run')) {
             $this->_printHeader($doTracking);
 

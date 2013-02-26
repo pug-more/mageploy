@@ -35,6 +35,21 @@ class PugMoRe_Mageploy_Model_Io_File {
         fputcsv($this->_done, $stream);
     }
 
+    public function getHistoryList($limit) {
+        $csv = new Varien_File_Csv();
+        try {
+            $historyList = $csv->getData($this->_helper->getStoragePath().$this->_helper->getAllActionsFilename());
+            if ($count = count($historyList)) {
+                if ($limit && $count > $limit) {
+                    $historyList = array_slice($historyList, $limit, $count, true);
+                }
+            }
+        } catch (Exception $e) {
+            $this->_helper->log($e->getMessage());
+        }
+        return $historyList;
+    }
+
     public function getPendingList() {
         $csv = new Varien_File_Csv();
         $pendingList = array();
@@ -56,7 +71,6 @@ class PugMoRe_Mageploy_Model_Io_File {
             $this->_helper->log($e->getMessage());
         }
         return $pendingList;
-
     }
 
 }
