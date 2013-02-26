@@ -108,6 +108,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
             } else {
                 $categoryId = false;
                 $newOrExisting = 'new';
+                $categoryName = $params['general']['name'];
                 $parentId = $params['general']['path'];
                 $parentCategory = Mage::getModel('catalog/category')->load($parentId);
                 $path = $parentCategory->getPath();
