@@ -9,7 +9,7 @@
  */
 require_once 'Mage/Adminhtml/controllers/System/ConfigController.php';
 
-class PugMoRe_Mageploy_Adminhtml_System_ConfigController extends Mage_Adminhtml_System_ConfigController {
+class PugMoRe_Mageploy_System_ConfigController extends Mage_Adminhtml_System_ConfigController {
 
     protected function _isAllowed() {
         return true;
