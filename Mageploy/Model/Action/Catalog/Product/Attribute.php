@@ -173,7 +173,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
             $result[self::INDEX_CONTROLLER_MODULE] = $this->_request->getControllerModule();
             $result[self::INDEX_CONTROLLER_NAME] = $this->_request->getControllerName();
             $result[self::INDEX_ACTION_NAME] = $this->_request->getActionName();
-            $result[self::INDEX_ACTION_PARAMS] = serialize($params);
+            $result[self::INDEX_ACTION_PARAMS] = $this->_encodeParams($params);
             $result[self::INDEX_ACTION_DESCR] = sprintf("%s %s Attribute with UUID '%s'", ucfirst($this->_request->getActionName()), ($isNew ? 'new' : 'existing'), $attributeUuid);
         } else {
             $result = false;
@@ -184,9 +184,8 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
     /*
      * return Mage_Core_Controller_Request_Http
      */
-
-    public function decode($serializedParameters) {
-        $parameters = unserialize($serializedParameters);
+    public function decode($encodedParameters) {
+        $parameters = $this->_decodeParams($encodedParameters);
         #$attributeCode = $parameters['mageploy_uuid'];
         if (isset($parameters['attribute_code'])) {
             $attributeCode = $parameters['attribute_code'];
@@ -214,7 +213,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
             $parameters['attribute_id'] = $attributeId;
         }
 
-        // TODO Decode Attribute Options
+        // Decode Attribute Options
         if (isset($parameters['option'])) {
             $option = $parameters['option'];
             

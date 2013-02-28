@@ -181,7 +181,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
             $result[self::INDEX_CONTROLLER_MODULE] = $this->_request->getControllerModule();
             $result[self::INDEX_CONTROLLER_NAME] = $this->_request->getControllerName();
             $result[self::INDEX_ACTION_NAME] = $this->_request->getActionName();
-            $result[self::INDEX_ACTION_PARAMS] = serialize($params);
+            $result[self::INDEX_ACTION_PARAMS] = $this->_encodeParams($params);
             $result[self::INDEX_ACTION_DESCR] = sprintf("%s %s Attribute Set with UUID '%s'", ucfirst($this->_request->getActionName()), $newOrExisting, $params['mageploy_uuid']);
         } else {
             $result = false;
@@ -194,10 +194,10 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
      * return Mage_Core_Controller_Request_Http
      */
 
-    public function decode($serializedParameters) {
+    public function decode($encodedParameters) {
         $helper = Mage::helper('pugmore_mageploy');
 
-        $parameters = unserialize($serializedParameters);
+        $parameters = $this->_decodeParams($encodedParameters);
         $attributeSetName = $parameters['mageploy_uuid'];
         $entityTypeId = $this->_getEntityTypeId();
         $entityTypeCode = $this->_getEntityTypeCode();

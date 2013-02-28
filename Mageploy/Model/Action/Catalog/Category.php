@@ -180,7 +180,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
             $result[self::INDEX_CONTROLLER_MODULE] = $this->_request->getControllerModule();
             $result[self::INDEX_CONTROLLER_NAME] = $this->_request->getControllerName();
             $result[self::INDEX_ACTION_NAME] = $this->_request->getActionName();
-            $result[self::INDEX_ACTION_PARAMS] = serialize($params);
+            $result[self::INDEX_ACTION_PARAMS] = $this->_encodeParams($params);
             $result[self::INDEX_ACTION_DESCR] = sprintf("%s %s Category named '%s'", ucfirst($this->_request->getActionName()), $newOrExisting, $categoryName);
         } else {
             $result = false;
@@ -192,8 +192,8 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
      * return Mage_Core_Controller_Request_Http
      */
 
-    public function decode($serializedParameters) {
-        $parameters = unserialize($serializedParameters);
+    public function decode($encodedParameters) {
+        $parameters = $this->_decodeParams($encodedParameters);
 
         // Id
         if (isset($parameters['id'])) {

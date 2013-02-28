@@ -38,9 +38,9 @@ class PugMoRe_Mageploy_Model_Action_System_Config extends PugMoRe_Mageploy_Model
                 }
             }
             
-            // Prevent propagating changes on user identifier
-            if (isset($params['groups']['mageploy']['fields']['user'])) {
-                unset($params['groups']['mageploy']['fields']['user']);
+            // Prevent propagating changes on mageploy's configuration
+            if (isset($params['groups']['mageploy']/*['fields']['user']*/)) {
+                unset($params['groups']['mageploy']/*['fields']['user']*/);
             }
             
             $result[self::INDEX_EXECUTOR_CLASS] = get_class($this);
@@ -48,7 +48,7 @@ class PugMoRe_Mageploy_Model_Action_System_Config extends PugMoRe_Mageploy_Model
             $result[self::INDEX_CONTROLLER_MODULE] = 'PugMoRe_Mageploy';
             $result[self::INDEX_CONTROLLER_NAME] = $this->_request->getControllerName();
             $result[self::INDEX_ACTION_NAME] = $this->_request->getActionName();
-            $result[self::INDEX_ACTION_PARAMS] = serialize($params);
+            $result[self::INDEX_ACTION_PARAMS] = $this->_encodeParams($params);
             $result[self::INDEX_ACTION_DESCR] = sprintf("%s System Config", ucfirst($this->_request->getActionName()));
         } else {
             $result = false;
@@ -56,8 +56,8 @@ class PugMoRe_Mageploy_Model_Action_System_Config extends PugMoRe_Mageploy_Model
         return $result;
     }
 
-    public function decode($serializedParameters) {
-        $parameters = unserialize($serializedParameters);
+    public function decode($encodedParameters) {
+        $parameters = $this->_decodeParams($encodedParameters);
         $request = new Mage_Core_Controller_Request_Http();
         $request->setPost($parameters);
         $request->setQuery($parameters);

@@ -23,6 +23,14 @@ abstract class PugMoRe_Mageploy_Model_Action_Abstract {
      */
     protected $_request;
     
+    protected function _encodeParams($params) {
+        return base64_encode(serialize($params));
+    }
+    
+    protected function _decodeParams($params) {
+        return deserialize(base64_decode($params));
+    }
+    
     public function toString() {
         return $this->_code;
     }
@@ -44,7 +52,8 @@ abstract class PugMoRe_Mageploy_Model_Action_Abstract {
         return $result;
     }
     
-    public function decode($serializedParameters) {
+    public function decode($encodedParameters) {
         
     }
+    
 }
