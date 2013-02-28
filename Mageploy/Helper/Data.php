@@ -10,6 +10,7 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract {
     private function __setActiveFlag($value) {
         $config = Mage::getModel('core/config');
         $config->saveConfig('dev/mageploy/active', $value);
+        Mage::app()->cleanCache(array(Mage_Core_Model_Config::CACHE_TAG));
     }
     
     public function log($msg) {
