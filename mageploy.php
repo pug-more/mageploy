@@ -159,7 +159,8 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                             $controller->$action();
                             $controller->postDispatch();
 
-                            if (isset($parameters['isAjax']) && $parameters['isAjax']) {
+                            #if (isset($parameters['isAjax']) && $parameters['isAjax']) {
+                            if ($request->getParam('isAjax', false)) {
                                 $messages = new Mage_Core_Model_Message_Collection();
                                 $body = $controller->getResponse()->getBody();
                                 if ($body == 'SUCCESS') {
