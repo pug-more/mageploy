@@ -158,15 +158,14 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                             $controller->$action();
                             $controller->postDispatch();
 
-                            #if (isset($parameters['isAjax']) && $parameters['isAjax']) {
+                            $messages = $session->getMessages(clear);
+                            // Add messages in body response in case of Ajax requests
                             if ($request->getParam('isAjax', false)) {
-                                $messages = new Mage_Core_Model_Message_Collection();
                                 $body = $controller->getResponse()->getBody();
                                 $msg = Mage::getSingleton('core/message')->notice($body);
                                 $messages->add($msg);
-                            } else {
-                                $messages = $session->getMessages(clear);
                             }
+                            
                             foreach ($messages->getItems() as $message) {
                                 $messageType = $message->getType();
                                 switch ($messageType) {
