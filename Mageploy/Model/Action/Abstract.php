@@ -28,7 +28,7 @@ abstract class PugMoRe_Mageploy_Model_Action_Abstract {
     }
     
     protected function _decodeParams($params) {
-        return deserialize(base64_decode($params));
+        return unserialize(base64_decode($params));
     }
     
     public function toString() {
