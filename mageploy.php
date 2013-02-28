@@ -7,22 +7,22 @@ if (file_exists('abstract.php')) {
 }
 
 class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
-    
-    const TERM_COLOR_RED    = '31m';
-    const TERM_COLOR_GREEN  = '32m';
+
+    const TERM_COLOR_RED = '31m';
+    const TERM_COLOR_GREEN = '32m';
     const TERM_COLOR_YELLOW = '33m';
-    
 
     protected $_options = array(
-        'track [val]'   => '0 to disable tracking, any other value or blank to enable it',
-        'history [n]'   => 'Show the last n changes. Leave n blank to show all',
-        'status'        => 'Show if there are any changes to be imported',
-        'run [id]'      => 'Import changes for specified action (not recommended); leave id blank to import all',
+        'track [val]' => '0 to disable tracking, any other value or blank to enable it',
+        'history [n]' => 'Show the last n changes. Leave n blank to show all',
+        'status' => 'Show if there are any changes to be imported',
+        'run [id]' => 'Import changes for specified action (not recommended); leave id blank to import all',
     );
-    
+
     private function __getColoredString($str, $color = null) {
-        if (is_null($color)) return $str;
-        
+        if (is_null($color))
+            return $str;
+
         return sprintf("\033[0;%s%s\033[0m", $color, $str);
     }
 
@@ -33,28 +33,28 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     protected function _initSession() {
         $userModel = Mage::getModel('admin/user');
         $userModel->setUserId(0);
-        Mage::getSingleton('admin/session')->setUser($userModel);        
+        Mage::getSingleton('admin/session')->setUser($userModel);
         /*
-        $session = Mage::getSingleton('admin/session');
-        try {
-            $user = Mage::getModel('admin/user');
-            $user->login('admin_username', 'admin_password');
-            if ($user->getId()) {
-                $session->renewSession();
+          $session = Mage::getSingleton('admin/session');
+          try {
+          $user = Mage::getModel('admin/user');
+          $user->login('admin_username', 'admin_password');
+          if ($user->getId()) {
+          $session->renewSession();
 
-                if (Mage::getSingleton('adminhtml/url')->useSecretKey()) {
-                    Mage::getSingleton('adminhtml/url')->renewSecretUrls();
-                }
-                $session->setIsFirstPageAfterLogin(true);
-                $session->setUser($user);
-                $session->setAcl(Mage::getResourceModel('admin/acl')->loadAcl());
-            } else {
-                Mage::throwException(Mage::helper('adminhtml')->__('Invalid User Name or Password.'));
-            }
-        } catch (Mage_Core_Exception $e) {
-            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-        }
-        */
+          if (Mage::getSingleton('adminhtml/url')->useSecretKey()) {
+          Mage::getSingleton('adminhtml/url')->renewSecretUrls();
+          }
+          $session->setIsFirstPageAfterLogin(true);
+          $session->setUser($user);
+          $session->setAcl(Mage::getResourceModel('admin/acl')->loadAcl());
+          } else {
+          Mage::throwException(Mage::helper('adminhtml')->__('Invalid User Name or Password.'));
+          }
+          } catch (Mage_Core_Exception $e) {
+          Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+          }
+         */
     }
 
     protected function _construct() {
@@ -124,7 +124,6 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
             } else {
                 printf("There aren't any pending actions to execute.\r\n");
             }
-            
         } else if ($id = $this->getArg('run')) {
             $this->_printHeader($doTracking);
 
@@ -163,18 +162,26 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                             if ($request->getParam('isAjax', false)) {
                                 $messages = new Mage_Core_Model_Message_Collection();
                                 $body = $controller->getResponse()->getBody();
-                                if ($body == 'SUCCESS') {
-                                    $msg = Mage::getSingleton('core/message')->success($body);
-                                } else {
-                                    $msg = Mage::getSingleton('core/message')->error($body);
-                                }
+                                $msg = Mage::getSingleton('core/message')->notice($body);
                                 $messages->add($msg);
                             } else {
                                 $messages = $session->getMessages(clear);
                             }
                             foreach ($messages->getItems() as $message) {
-                                $color = $message->getType() == 'error' ? self::TERM_COLOR_RED : self::TERM_COLOR_GREEN;
-
+                                $messageType = $message->getType();
+                                switch ($messageType) {
+                                    case Mage_Core_Model_Message::ERROR:
+                                        $color = self::TERM_COLOR_RED;
+                                        break;
+                                    case Mage_Core_Model_Message::SUCCESS:
+                                        $color = self::TERM_COLOR_GREEN;
+                                        break;
+                                    default: #break intentionally omitted   
+                                    case Mage_Core_Model_Message::WARNING: #break intentionally omitted
+                                    case Mage_Core_Model_Message::NOTICE:
+                                        $color = self::TERM_COLOR_YELLOW;
+                                        break;
+                                }
                                 printf("Action ID #%d - %s %s\r\n", ($i + 1), $this->__getColoredString($message->getType(), $color), $message->getText());
                             }
 
@@ -214,9 +221,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     }
 
     protected function _printHeader($isActive) {
-        $active = $isActive 
-            ? $this->__getColoredString("tracking is active", self::TERM_COLOR_GREEN)
-            : $this->__getColoredString("tracking is not active", self::TERM_COLOR_RED);
+        $active = $isActive ? $this->__getColoredString("tracking is active", self::TERM_COLOR_GREEN) : $this->__getColoredString("tracking is not active", self::TERM_COLOR_RED);
         $user = Mage::helper('pugmore_mageploy')->getUser();
         $user = $this->__getColoredString("user is " . $user, !strcmp('anonymous', $user) ? self::TERM_COLOR_YELLOW : self::TERM_COLOR_GREEN);
         printf("\r\nMageploy v %s - %s - %s\r\n\r\n", $this->__getVersion(), $active, $user);
