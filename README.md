@@ -26,7 +26,7 @@ At the moment the following trackers have been developed for (not tested so much
 * Attributes
 * Attribute Sets
 * System Config (uncomplete)
-* Categories (uncomplete)
+* Categories
 
 TO-BE
 -----
