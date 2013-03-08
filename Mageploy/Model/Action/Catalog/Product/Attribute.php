@@ -200,12 +200,15 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
         $attribute = Mage::getResourceModel('eav/entity_attribute_collection')
                     ->setCodeFilter($attributeCode)
                     ->getFirstItem();
-        $attributeOptions = $attribute->getSource()->getAllOptions(false);
-        $attributeOptionsByValue = array();
-        foreach ($attributeOptions as $order => $valuelabel) {
-            $optionId = $valuelabel['value'];
-            $adminVal = $valuelabel['label'];
-            $attributeOptionsByValue[$adminVal] = array('order' => $order, 'id' => $optionId);
+        
+        if ($attribute->getSourceModel()) {
+            $attributeOptions = $attribute->getSource()->getAllOptions(false);
+            $attributeOptionsByValue = array();
+            foreach ($attributeOptions as $order => $valuelabel) {
+                $optionId = $valuelabel['value'];
+                $adminVal = $valuelabel['label'];
+                $attributeOptionsByValue[$adminVal] = array('order' => $order, 'id' => $optionId);
+            }
         }
 
         $entityTypeId = Mage::helper('pugmore_mageploy')->getEntityTypeIdFromCode(Mage_Catalog_Model_Product::ENTITY);
@@ -251,8 +254,10 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
         }
 
         // Decode Default Option
-        $optionUuid = $parameters['default'][0];
-        $parameters['default'][0] = $this->_getOptionIdByUuid($optionUuid, $attributeOptionsByValue, $newOptions);
+        if (isset($attributeOptionsByValue)) {
+            $optionUuid = $parameters['default'][0];
+            $parameters['default'][0] = $this->_getOptionIdByUuid($optionUuid, $attributeOptionsByValue, $newOptions);
+        }
         
         // Decode Frontend Label
         $newFrontendLabel = array();
