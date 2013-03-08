@@ -27,6 +27,7 @@ At the moment the following trackers have been developed for (not tested so much
 * Attribute Sets
 * System Config (uncomplete)
 * Categories
+* CMS Blocks (uncomplete)
 
 TO-BE
 -----
