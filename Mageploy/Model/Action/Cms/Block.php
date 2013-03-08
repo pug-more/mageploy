@@ -41,8 +41,7 @@ class PugMoRe_Mageploy_Model_Action_Cms_Block extends PugMoRe_Mageploy_Model_Act
             }
             
             $result[self::INDEX_EXECUTOR_CLASS] = get_class($this);
-            #$result[self::INDEX_CONTROLLER_MODULE] = $this->_request->getControllerModule();
-            $result[self::INDEX_CONTROLLER_MODULE] = 'PugMoRe_Mageploy';
+            $result[self::INDEX_CONTROLLER_MODULE] = $this->_request->getControllerModule();
             $result[self::INDEX_CONTROLLER_NAME] = $this->_request->getControllerName();
             $result[self::INDEX_ACTION_NAME] = $this->_request->getActionName();
             $result[self::INDEX_ACTION_PARAMS] = $this->_encodeParams($params);
