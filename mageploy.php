@@ -79,6 +79,8 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     }
 
     public function run() {
+        ob_start(); // enable output buffering to avoid "headers already sent" problem
+        
         $helper = Mage::helper('pugmore_mageploy');
 
         $track = $this->getArg('track');
