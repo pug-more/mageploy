@@ -32,7 +32,11 @@ class PugMoRe_Mageploy_Model_Action_Cms_Block extends PugMoRe_Mageploy_Model_Act
         if ($this->_request) {
             $params = $this->_request->getParams();
             
-            // todo convert store ids
+            // convert store ids
+            foreach ($params['stores'] as $i => $storeId) {
+                $storeUuid = Mage::app()->getStore($storeId)->getCode();
+                $params['stores'][$i] = $storeUuid;
+            }
 
             foreach ($this->_blankableParams as $key) {
                 if (isset($params[$key])) {
@@ -54,6 +58,13 @@ class PugMoRe_Mageploy_Model_Action_Cms_Block extends PugMoRe_Mageploy_Model_Act
 
     public function decode($encodedParameters) {
         $parameters = $this->_decodeParams($encodedParameters);
+        
+        // convert store ids
+        foreach ($parameters['stores'] as $i => $storeUuid) {
+            $storeId = Mage::app()->getStore($storeUuid)->getId();
+            $parameters['stores'][$i] = $storeId;
+        }        
+        
         $request = new Mage_Core_Controller_Request_Http();
         $request->setPost($parameters);
         $request->setQuery($parameters);
