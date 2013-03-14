@@ -28,6 +28,7 @@ At the moment the following trackers have been developed for (not tested so much
 * System Config (uncomplete)
 * Categories
 * CMS Blocks
+* CMS Pages
 
 TO-BE
 -----
@@ -43,7 +44,6 @@ So many more trackers should be developed for:
 * Taxes
 * URL Rewrites
 * Promotions
-* CMS Pages
 * Transactional Emails
 * Stores
 * Order Statuses

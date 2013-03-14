@@ -58,6 +58,10 @@
                     <disabled>0</disabled>
                     <class>PugMoRe_Mageploy_Model_Action_Cms_Block</class>
                 </cms_block>
+                <cms_page>
+                    <disabled>0</disabled>
+                    <class>PugMoRe_Mageploy_Model_Action_Cms_Page</class>
+                </cms_page>
             </actions>
         </mageploy>
         
