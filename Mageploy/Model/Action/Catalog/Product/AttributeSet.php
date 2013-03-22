@@ -217,6 +217,10 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
             $attributeUuid = $attribute[0];
             $attributeId = $helper->getAttributeIdFromCode($attributeUuid, $entityTypeId);
 
+            if ($attributeId == 208) {
+                $break = $here;
+            }
+            
             $attributeGroupUuid = $attribute[1];
 
             // Is new Group?
@@ -224,19 +228,9 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
                 $attributeGroupId = $attributeGroupUuid;
                 $eavAttributeId = null;
             } else {
+                // $attributeSetUuid is not used; we still have to explode the 
+                // string in order to mantain compatibility with encoding
                 list($attributeGroupName, $attributeSetUuid) = explode(self::UUID_SEPARATOR, $attributeGroupUuid);
-                $attributeSetName = $attributeSetUuid;
-
-                try {
-                    $attributeSetId = $helper->getAttributeSetId($attributeSetName, $entityTypeCode);
-                } catch (Exception $e) {
-                    echo '$attributeSetName, $entityTypeCode' . "\n";
-                    var_dump($attributeSetName);
-                    var_dump($entityTypeCode);
-                    echo "\n";
-                    throw new Exception($e);
-                }
-                
                 $attributeGroupId = $helper->getAttributeGroupId($attributeSetId, $attributeGroupName);
                 $eavAttributeId = $helper->getEavEntityAttributeId($entityTypeId, $attributeSetId, $attributeGroupId, $attributeId);
             }
