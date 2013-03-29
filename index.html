@@ -1,152 +1,262 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <title>Mageploy by pug-more</title>
-  </head>
+    <head>
+        <meta charset='utf-8'>
+        <meta http-equiv="X-UA-Compatible" content="chrome=1">
+        <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+        <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+        <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+        <!--[if lt IE 9]>
+        <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <title>Mageploy by pug-more</title>
+    </head>
 
-  <body>
-    <div id="container">
-      <div class="inner">
+    <body>
+        <div id="container">
+            <div class="inner">
 
-        <header>
-          <h1 style="height:210px;text-indent:-9000px;background:transparent url(images/mageploy_256_noborder.png) no-repeat top left;">Mageploy</h1>
-          <h2>Easily keep track of changes between different Magento environments.</h2>
-        </header>
+                <header>
+                    <h1 style="height:210px;text-indent:-9000px;background:transparent url(images/mageploy_256_noborder.png) no-repeat top left;">Mageploy</h1>
+                    <h2>Easily keep track of changes between different Magento deployment environments.</h2>
+                </header>
 
-        <section id="downloads" class="clearfix">
-          <a href="https://github.com/pug-more/mageploy/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
-          <a href="https://github.com/pug-more/mageploy/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
-          <a href="https://github.com/pug-more/mageploy" id="view-on-github" class="button"><span>View on GitHub</span></a>
-        </section>
+                <section id="downloads" class="clearfix">
+                    <a href="https://github.com/pug-more/mageploy/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+                    <a href="https://github.com/pug-more/mageploy/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+                    <a href="https://github.com/pug-more/mageploy" id="view-on-github" class="button"><span>View on GitHub</span></a>
+                </section>
 
-        <hr>
+                <hr>
 
-        <section id="main_content">
-          <!--<p><img src="https://raw.github.com/wiki/pug-more/mageploy/mageploy_256_noborder.png" alt="Logo of Mageploy"></p>-->
+                <section id="main_content">
+                    <!--<p><img src="https://raw.github.com/wiki/pug-more/mageploy/mageploy_256_noborder.png" alt="Logo of Mageploy"></p>-->
 
-<h1>1. Introduction</h1>
+                    <h1>1. Introduction</h1>
 
-<p>If you are reading this documentation you are likely a developer who had the chance to work with Magento. There are several tools that were born with the intent of leveraging the development experience on Magento. Some favourite tools are N98magerun, Modman and Magentleman. Mageploy aims at becoming one of them. It's intended to facilitate the deployment process, something new to any other tool, as far as we know.</p>
+                    <p>If you are reading this documentation you are likely a developer who had the chance to work with Magento. There are several tools that were born with the intent of leveraging the development experience on Magento. Some favourite tools are N98magerun, Modman and Magentleman. Mageploy aims at becoming one of them. It's intended to facilitate the deployment process, something new to any other tool, as far as we know.</p>
 
-<p>What do we intend with the word "deployment"? If you have developed a complete web store with Magento you know that it's not all about code. It's also a matter of doing some activity (sometimes a lot of that) in the Admin Control Panel. Things like creating Attributes, associating them to brand new Attribute Sets, structuring Category trees, changing System Configuration and so on (and on). Once you have done all this kind of work in your development environment you have to be sure that it will be done exactly the same way on each other environment involved in the process: other developers' environments, staging environments and finally the production environment. So, with the word "deploy" we not only mean mantaining code consistency among different environments but also mantaining entities and configuration consistency.</p>
+                    <p>What do we intend with the word "deployment"? If you have developed a complete web store with Magento you know that it's not all about code. It's also a matter of doing some activity (sometimes a lot of that) in the Admin Control Panel. Things like creating Attributes, associating them to brand new Attribute Sets, structuring Category trees, changing System Configuration and so on (and on). Once you have done all this kind of work in your development environment you have to be sure that it will be done exactly the same way on each other environment involved in the process: other developers' environments, staging environments and finally the production environment. So, with the word "deploy" we not only mean mantaining code consistency among different environments but also mantaining entities and configuration consistency.</p>
 
-<p>Given that you already know how to mantain code consistency (you are on GitHub after all), Mageploy aims at automating the process of mantaining entities and configuration consistency without obliging you to bypass the usage of the Admin Control Panel. Infact, the only other way of mantaining such consistency (the so called "best practice") is that of writing install/upgrade scripts which create entities and change System Configuration programmatically. That's definitively boring and error prone.</p>
+                    <p>Given that you already know how to mantain code consistency (you are on GitHub after all), Mageploy aims at automating the process of mantaining entities and configuration consistency without obliging you to bypass the usage of the Admin Control Panel. Infact, the only other way of mantaining such consistency (the so called "best practice") is that of writing install/upgrade scripts which create entities and change System Configuration programmatically. That's definitively boring and error prone.</p>
 
-<h2>1.1 About Mageploy</h2>
+                    <h2>1.1 About Mageploy</h2>
 
-<p>Mageploy has been developed on <strong>Magento CE v 1.7.0.2</strong> and hasn't been tested with different CE or EE versions yet.</p>
+                    <p>Mageploy has been developed on <strong>Magento CE v 1.7.0.2</strong> and hasn't been tested with different CE or EE versions yet.</p>
 
-<p>The idea of Mageploy was born within a discussion on Magento Stack Exchange named "What is the best deploy strategy?" that you can read at the following URL: <a href="http://magento.stackexchange.com/questions/252/what-is-the-best-deploy-strategy">http://magento.stackexchange.com/questions/252/what-is-the-best-deploy-strategy</a>. In that discussion I asked to Magento developers what was their preferred deploy strategy and answers given to me made me understand that there wasn't any commonly adopted strategy, except for the "definitively boring and error prone" practice of doing a lot of code to mantain consistency among different environments.</p>
+                    <p>The idea of Mageploy was born within a discussion on Magento Stack Exchange named "What is the best deploy strategy?" that you can read at the following URL: <a href="http://magento.stackexchange.com/questions/252/what-is-the-best-deploy-strategy">http://magento.stackexchange.com/questions/252/what-is-the-best-deploy-strategy</a>. In that discussion I asked to Magento developers what was their preferred deploy strategy and answers given to me made me understand that there wasn't any commonly adopted strategy, except for the "definitively boring and error prone" practice of doing a lot of code to mantain consistency among different environments.</p>
 
-<p>So the idea of developing Mageploy took place and here we are.</p>
+                    <p>So the idea of developing Mageploy took place and here we are.</p>
 
-<p>The basic idea under Mageploy is that every action you perform in the Magento Admin Control Panel translates into an invocation of a method of a controller. These "action methods" take their parameters from the HTTP request object. So it's all about tracking and serializing these method calls and request parameters into a file and centralizing it under a version control system. Each action you perform on your environment not only is stored into a "global actions" file but also in a "local actions" file which is not versioned. 
-Are you getting it? Actions performed in other enviroments result from the difference between global actions and your local actions, once you have checked out the global file.</p>
+                    <p>The basic idea under Mageploy is that every action you perform in the Magento Admin Control Panel translates into an invocation of a method of a controller. These "action methods" take their parameters from the HTTP request object. So it's all about tracking and serializing these method calls and request parameters into a file and centralizing it under a version control system. Each action you perform on your environment not only is stored into a "global actions" file but also in a "local actions" file which is not versioned. 
+                        Are you getting it? Actions performed in other enviroments result from the difference between global actions and your local actions, once you have checked out the global file.</p>
 
-<p>Replicating these actions having stored method names and parameters should be a joke, isn't it? Obviously it's not so simple. There is a problem concerning the fact that every environment has its own IDs which you can't count on when they are part of a method's parameters. So we have to focus on finding a way to convert specific IDs into universally unique identifiers (UUIDs) so that we could do our data marshalling and demarshalling without worrying about specific IDs.</p>
+                    <p>Replicating these actions having stored method names and parameters should be a joke, isn't it? Obviously it's not so simple. There is a problem concerning the fact that every environment has its own IDs which you can't count on when they are part of a method's parameters. So we have to focus on finding a way to convert specific IDs into universally unique identifiers (UUIDs) so that we could do our data marshalling and demarshalling without worrying about specific IDs.</p>
 
-<p>That's the complex part of Mageploy but that's also its strength and once we are able to perform a conversion from IDs to UUIDs and back we are able to replicate changes between different environments automatically and consistently. Converting IDs into UUIDs can sometimes force some limitations and there is also the risk of logical conflicts: think, for example, to two developers creating an attribute with the same code. Mageploy can facilitate our deployment tasks a lot but can't work magic; even Git can't automatically solve code conflicts after all.</p>
+                    <p>That's the complex part of Mageploy but that's also its strength and once we are able to perform a conversion from IDs to UUIDs and back we are able to replicate changes between different environments automatically and consistently. Converting IDs into UUIDs can sometimes force some limitations and there is also the risk of logical conflicts: think, for example, to two developers creating an attribute with the same code. Mageploy can facilitate our deployment tasks a lot but can't work magic; even Git can't automatically solve code conflicts after all.</p>
 
-<h2>1.2 Installation and Setup</h2>
+                    <h2>1.2 Installation and Setup</h2>
 
-<p>To install Mageploy easily we suggest you to install Modman (Module Manager) by Colin Mollenhour; you can find the instructions to install Modman here: <a href="https://github.com/colinmollenhour/modman">https://github.com/colinmollenhour/modman</a>.</p>
+                    <p>To install Mageploy easily we suggest you to install Modman (Module Manager) by Colin Mollenhour; you can find the instructions to install Modman here: <a href="https://github.com/colinmollenhour/modman">https://github.com/colinmollenhour/modman</a>.</p>
 
-<p>Once you have Modman installed, go to the root folder of your Magento project and type the following commands to initialize Modman:</p>
+                    <p>Once you have Modman installed, go to the root folder of your Magento project and type the following commands to initialize Modman:</p>
 
-<pre><code>$ modman init
+                    <pre><code>$ modman init</code></pre>
+
+                    <p>and then,  to clone Mageploy from its git repository via ssh:</p>
+
+                    <pre><code>$ modman clone git@github.com:pug-more/mageploy.git</code></pre>
+
+                    <p>After that, clear your Magento Cache, if enabled, and run Magento Compilation Process if Compilation is enabled. We assume you know how to perform such tasks. If not, you'd better know.</p>
+
+                    <p>At this point Mageploy should be up and running but still needs some configuration changes.</p>
+
+                    <p>Go to System -&gt; Configuration -&gt; Advanced -&gt; Developer section and  expand the "Mageploy" tab.
+                        Then you can change the values of the following configuration parameters:</p>
+
+                    <ul>
+                        <li>
+                            <strong>Active:</strong> choose whether to activate action tracking. By default tracking is active. Activation can be performed faster through the command line, as we will see in the section dedicated to the command line tool.</li>
+                        <li>
+                            <strong>Debug mode:</strong> if set to Yes, Mageploy will write logs even if logging is disabled in Magento.</li>
+                        <li>
+                            <strong>Specific User Identification:</strong> by default it is set to "anonymous" and we encourage you to change this value and set a unique identifier among the different environments the project is developed and deployed on. This way, when you'll show the history of global changes, you will be able to distinguish who did what. Another reason to differentiate this value among different environments is that doing so you will enforce the  probability to avoid conflicts among global actions.</li>
+                    </ul><p>There is only one step remaining to begin taking advantage from the usage of Mageploy. 
+                        Run the following command from the root folder of your Magento project:</p>
+
+                    <pre><code>$ php shell/mageploy.php --status
 </code></pre>
 
-<p>and then,  to clone Mageploy from its git repository via ssh:</p>
+                    <p>At this point you should see something similar to the following</p>
 
-<pre><code>$ modman clone git@github.com:pug-more/mageploy.git
-</code></pre>
-
-<p>After that, clear your Magento Cache, if enabled, and run Magento Compilation Process if Compilation is enabled. We assume you know how to perform such tasks. If not, you'd better know.</p>
-
-<p>At this point Mageploy should be up and running but still needs some configuration changes.</p>
-
-<p>Go to System -&gt; Configuration -&gt; Advanced -&gt; Developer section and  expand the "Mageploy" tab.
-Then you can change the values of the following configuration parameters:</p>
-
-<ul>
-<li>
-<strong>Active:</strong> choose whether to activate action tracking. By default tracking is active. Activation can be performed faster through the command line, as we will see in the section dedicated to the command line tool.</li>
-<li>
-<strong>Debug mode:</strong> if set to Yes, Mageploy will write logs even if logging is disabled in Magento.</li>
-<li>
-<strong>Specific User Identification:</strong> by default it is set to "anonymous" and we encourage you to change this value and set a unique identifier among the different environments the project is developed and deployed on. This way, when you'll show the history of global changes, you will be able to distinguish who did what. Another reason to differentiate this value among different environments is that doing so you will enforce the  probability to avoid conflicts among global actions.</li>
-</ul><p>There is only one step remaining to begin taking advantage from the usage of Mageploy. 
-Run the following command from the root folder of your Magento project:</p>
-
-<pre><code>$ php shell/mageploy --status
-</code></pre>
-
-<p>At this point you should see something similar to the following</p>
-
-<pre><code>Mageploy v 1.0.0 - tracking is active - user is aronchi
-
+<pre><code>Mageploy v 1.0.0 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
 There aren't any pending actions to execute.
 </code></pre>
 
-<p>Most important, your first invocation of Mageploy's command line tool has the effect of creating a folder named "mageploy" under Magento's "var" folder and initializing the "mageploy_all.csv" and "mageploy_executed.csv" files. Put the "mageploy_all.csv" under version control and ignore "mageploy_executed.csv" from version control and you are almost done.</p>
+                    <p>Most important, your first invocation of Mageploy's command line tool has the effect of creating a folder named "mageploy" under Magento's "var" folder and initializing the "mageploy_all.csv" and "mageploy_executed.csv" files. Put the "mageploy_all.csv" under version control and ignore "mageploy_executed.csv" from version control and you are almost done.</p>
 
-<h2>1.3 Basic Usage</h2>
+                    <h2>1.3 Basic Usage</h2>
 
-<p>Once Mageploy is configured and tracking is activated, actions you perform in certain sections of Magento Admin Panel are tracked both into "mageploy_all.csv" and "mageploy_executed.csv" files.</p>
+                    <p>Once Mageploy is configured and tracking is activated, actions you perform in certain sections of Magento Admin Panel are tracked both into "mageploy_all.csv" and "mageploy_executed.csv" files.</p>
 
-<p>Replicating tracking in both files serves the purpose of instructing Mageploy about which actions have been executed locally (the ones in "mageploy_executed.csv" which has not to be put under version control) and don't have to be replicated while reading the global actions (the ones in "mageploy_all.csv", which has to be put under version control).</p>
+                    <p>Replicating tracking in both files serves the purpose of instructing Mageploy about which actions have been executed locally (the ones in "mageploy_executed.csv" which has not to be put under version control) and don't have to be replicated while reading the global actions (the ones in "mageploy_all.csv", which has to be put under version control).</p>
 
-<p>That's quite all you have to know, except that you have to learn how to use the Command Line Tool. See the  following paragraph dedicated to the Command Line Tool for further instructions.</p>
+                    <p>That's quite all you have to know, except that you have to learn how to use the Command Line Tool. See the  following paragraph dedicated to the Command Line Tool for further instructions.</p>
 
-<h2>1.4 The Command Line Tool</h2>
+                    <h2>1.4 The Command Line Tool</h2>
+                    
+                    <p>The Command Line Tool allows you to monitor Mageploy's tracking status and history, enable or disable tracking, running pending actions that, once executed, should keep tracked areas of Magento easily aligned.</p>
+                    
+                    <p>To get an overview of different commands you can issue on the Command Line Tool, you can try the following (assuming you are on the Magento root installation folder):</p>
+                    
+                    <pre><code>$ php shell/mageploy.php --help</code></pre>
+                    
+                    <p>The result will be somthing like the following:</p>
+                    
+<pre><code>Mageploy v 1.0.0 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
 
-<h2>1.5 Summary</h2>
+Usage:	php mageploy.php --[options]
 
-<h1>2. Trackers</h1>
+--h/help            to show this help
+--t/track [val]     0 to disable tracking, any other value or blank to enable it
+--hi/history [n]    Show the last n changes. Leave n blank to show all
+--s/status          Show if there are any changes to be imported
+--r/run [id]        Import changes for specified action (not recommended); leave id blank to import all
+</code></pre>
+                    
+                    <p>As you can see, you can use a short version for each option and it's what we suggest you to do, unless you are paid for the number of characters you type on a keyboard.</p>
 
-<h2>2.1 About Trackers</h2>
+                    <p>Now let's see how the different options operates.</p>
+                    
+                    <h3>1.4.1 Activating/Deactivating tracking</h3>
+                    
+                    <p>Sometimes deactivating trackers can be useful or necessary; for example you may need to change values in System Config that you don't want to propagate to other environments. Or maybe you need to create a test Attribute or Category and delete them after you have done your tests without the need to deploy these actions.</p>
+                    
+                    <p>To <strong>deactivate</strong> all the trackers at the same time, you can use the following command:</p>
+                    
+<pre><code>$ php shell/mageploy.php -t 0</code></pre>
+                    
+                    <p>To <strong>activate</strong> all the trackers at the same time, you can use the following command:</p>
+                    
+<pre><code>$ php shell/mageploy.php -t 1</code></pre>
+                    
+                    <p>Note that omitting the value after the <code>-t</code> option corresponds to activating the tracking.</p>
+                    
+                    <p>Remember that the same option can be changed via the Magento Admin Control Panel in the "Mageploy" tab under System -> Configuration -> Advanced -> Developer section. But it's far more easy to change it via the Command Line Tool, isnt' it?</p>
 
-<h2>2.2 Attribute Tracker</h2>
+                    <h3>1.4.2 Showing tracking history</h3>
+                    
+                    <p>To show the list of all tracked actions so far, type the following:</p>
 
-<h2>2.3 Attribute Set Tracker</h2>
+<pre><code>$ php shell/mageploy.php -hi</code></pre>
 
-<h2>2.4 Category Tracker</h2>
+                    <p>If you have tracked something so far, you should obtain something like:</p>
 
-<h2>2.5 System Config Tracker</h2>
+<pre><code>Mageploy v 1.0.0 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
 
-<h2>2.6 CMS Page Tracker</h2>
+Global Actions list:
+ID: 1	 - Save existing Attribute Set with UUID 'Test Group' (aronchi on Thu Mar 14 11:25:25 2013)
+ID: 2	 - Save existing Attribute Set with UUID 'Test Group' (aronchi on Thu Mar 14 11:29:41 2013)
+ID: 3	 - Save existing Attribute Set with UUID 'Test Group' (aronchi on Thu Mar 14 11:34:54 2013)
+ID: 4	 - Save existing Attribute Set with UUID 'Test Group' (aronchi on Thu Mar 14 11:35:15 2013)
+ID: 5	 - Save existing Attribute Set with UUID 'Test Group' (aronchi on Thu Mar 14 11:35:45 2013)
+ID: 6	 - Save Static Block 'footer_links' (aronchi on Thu Mar 14 13:43:06 2013)
+ID: 7	 - Save Static Block 'footer_links' (aronchi on Thu Mar 14 13:45:55 2013)
+ID: 8	 - Save Static Block 'footer_links' (aronchi on Thu Mar 14 13:48:42 2013)
+ID: 9	 - Save Static Block 'footer_links' (aronchi on Thu Mar 14 13:50:18 2013)
+ID: 10	 - Save Static Block 'sample_block' (aronchi on Thu Mar 14 13:55:29 2013)
+ID: 11	 - Save Static Block 'customer-service' (aronchi on Thu Mar 14 14:03:17 2013)
+ID: 12	 - Save Static Block 'another-sample-page' (aronchi on Thu Mar 14 14:05:22 2013)
+ID: 13	 - Save new CMS Page 'another-sample-page' (aronchi on Thu Mar 14 14:19:43 2013)
+ID: 14	 - Save existing CMS Page 'another-sample-page' (aronchi on Thu Mar 14 14:26:55 2013)
+ID: 15	 - Save existing CMS Page 'customer-service' (aronchi on Thu Mar 14 14:35:38 2013)
+ID: 16	 - Save existing CMS Page 'customer-service' (aronchi on Thu Mar 14 14:38:51 2013)
 
-<h2>2.7 Static Block Tracker</h2>
+Total global actions listed: 16
+</code></pre>
+                    
+                    <p>You can specify a number, say 5, after the <code>hi</code> option in order to show the list of the last five actions tracked so far:</p>
+                    
+<pre><code>$ php shell/mageploy.php -hi 5</code></pre>
 
-<h2>2.8 Summary</h2>
+<pre><code>Mageploy v 1.0.0 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
 
-<h1>3. Extending Mageploy</h1>
+Global Actions list:
+ID: 12	 - Save Static Block 'another-sample-page' (aronchi on Thu Mar 14 14:05:22 2013)
+ID: 13	 - Save new CMS Page 'another-sample-page' (aronchi on Thu Mar 14 14:19:43 2013)
+ID: 14	 - Save existing CMS Page 'another-sample-page' (aronchi on Thu Mar 14 14:26:55 2013)
+ID: 15	 - Save existing CMS Page 'customer-service' (aronchi on Thu Mar 14 14:35:38 2013)
+ID: 16	 - Save existing CMS Page 'customer-service' (aronchi on Thu Mar 14 14:38:51 2013)
 
-<h2>3.1 Tracker Basics</h2>
+Total global actions listed: 5
+</code></pre>
+                    
+                    <p>In case you never tracked anything before, you will simply get:</p>
+<pre><code>Mageploy v 1.0.0 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
 
-<h2>3.2 Adding a Tracker</h2>
+There aren't any actions tracked.
+</code></pre>
+                    
+                    
+                    <h3>1.4.3 Showing tracking status</h3>
+                    
+                    <p>Say that you have just updated the "mageploy_all.csv" file from your preferred Source Control System; the first thing we suggest to do, at his point, is typing the following:</p>
 
-<h2>3.3 Developing a Tracker</h2>
+<pre><code>$ php shell/mageploy.php -s</code></pre>                    
+                    
+                    <p>Something similar to the following could appear:</p>
 
-<h2>3.4 Summary</h2>
-        </section>
+<pre><code>Mageploy v 1.0.0 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
+                    
+Pending Actions list:
+ID: 17	 - Save existing CMS Page 'about-us' (rgambuzzi on Thu Mar 15 15:17:47 2013)
 
-        <footer>
-          Mageploy is maintained by <a href="https://github.com/pug-more">pug-more</a><br>
-          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.
-        </footer>
+Total pending actions: 1                    
+</code></pre>
 
-        
-      </div>
-    </div>
-  </body>
+                    <p>What does it mean? Simply put, our working mate whose username is "rgambuz" has done some changes on the existing "about-us" CMS Page; he has tracked his changes and now Mageploy knows that this has to be replicated in your environment. That's where Mageploy can start showing off its potential.</p>
+                    
+                    <h3>1.4.4 Running pending actions</h3>
+                    
+                    <h2>1.5 Summary</h2>
+
+                    <h1>2. Trackers</h1>
+
+                    <h2>2.1 About Trackers</h2>
+
+                    <h2>2.2 Attribute Tracker</h2>
+
+                    <h2>2.3 Attribute Set Tracker</h2>
+
+                    <h2>2.4 Category Tracker</h2>
+
+                    <h2>2.5 System Config Tracker</h2>
+
+                    <h2>2.6 CMS Page Tracker</h2>
+
+                    <h2>2.7 Static Block Tracker</h2>
+
+                    <h2>2.8 Summary</h2>
+
+                    <h1>3. Extending Mageploy</h1>
+
+                    <h2>3.1 Tracker Basics</h2>
+
+                    <h2>3.2 Adding a Tracker</h2>
+
+                    <h2>3.3 Developing a Tracker</h2>
+
+                    <h2>3.4 Summary</h2>
+                </section>
+
+                <footer>
+                    Mageploy is maintained by <a href="https://github.com/pug-more">pug-more</a><br>
+                    This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.
+                </footer>
+
+
+            </div>
+        </div>
+    </body>
 </html>
