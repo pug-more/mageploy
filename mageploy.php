@@ -13,10 +13,11 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     const TERM_COLOR_YELLOW = '33m';
 
     protected $_options = array(
-        'track [val]' => '0 to disable tracking, any other value or blank to enable it',
-        'history [n]' => 'Show the last n changes. Leave n blank to show all',
-        'status' => 'Show if there are any changes to be imported',
-        'run [id]' => 'Import changes for specified action (not recommended); leave id blank to import all',
+        '--h/help' => 'to show this help',
+        '--t/track [val]' => '0 to disable tracking, any other value or blank to enable it',
+        '--hi/history [n]' => 'Show the last n changes. Leave n blank to show all',
+        '--s/status' => 'Show if there are any changes to be imported',
+        '--r/run [id]' => 'Import changes for specified action (not recommended); leave id blank to import all',
     );
 
     private function __getColoredString($str, $color = null) {
@@ -73,6 +74,15 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
         return $file;
     }
 
+    public function getArgs() {
+        $val = null;
+        foreach (func_get_args() as $arg) {
+            $val = $this->getArg($arg);
+            if (!is_null($val)) break;
+        }
+        return $val;
+    }
+    
     public function _getControllerClassName($controllerModule, $controllerName) {
         $class = $controllerModule . '_' . uc_words($controllerName) . 'Controller';
         return $class;
@@ -83,7 +93,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
         
         $helper = Mage::helper('pugmore_mageploy');
 
-        $track = $this->getArg('track');
+        $track = $this->getArgs('t', 'track');
         if ($track !== false) {
             if (!strcmp('0', $track)) {
                 $doTracking = $helper->disable();
@@ -94,7 +104,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
             $doTracking = $helper->isActive();
         }
 
-        if ($this->getArg('status')) {
+        if ($this->getArgs('s', 'status')) {
             $this->_printHeader($doTracking);
 
             $pendingList = $this->_io->getPendingList();
@@ -110,7 +120,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
             } else {
                 printf("There aren't any pending actions to execute.\r\n");
             }
-        } else if ($limit = $this->getArg('history')) {
+        } else if ($limit = $this->getArgs('hi', 'history')) {
             $this->_printHeader($doTracking);
 
             $historyList = $this->_io->getHistoryList($limit);
@@ -126,7 +136,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
             } else {
                 printf("There aren't any pending actions to execute.\r\n");
             }
-        } else if ($id = $this->getArg('run')) {
+        } else if ($id = $this->getArgs('r', 'run')) {
             $this->_printHeader($doTracking);
 
             $pendingList = $this->_io->getPendingList();
@@ -216,7 +226,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
 
         $help = "Usage:\tphp mageploy.php --[options]\r\n\r\n";
         foreach ($this->_options as $option => $description) {
-            $help .= "--$option" . str_repeat(" ", 20 - strlen($option)) . "$description\r\n";
+            $help .= "$option" . str_repeat(" ", 20 - strlen($option)) . "$description\r\n";
         }
         return $help . "\r\n";
     }

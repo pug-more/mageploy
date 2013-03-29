@@ -41,7 +41,7 @@ class PugMoRe_Mageploy_Model_Io_File {
             $historyList = $csv->getData($this->_helper->getStoragePath().$this->_helper->getAllActionsFilename());
             if ($count = count($historyList)) {
                 if ($limit && $count > $limit) {
-                    $historyList = array_slice($historyList, $limit, $count, true);
+                    $historyList = array_slice($historyList, $count-$limit, $count, true);
                 }
             }
         } catch (Exception $e) {
