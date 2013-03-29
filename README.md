@@ -1,4 +1,4 @@
-![Logo of Mageploy](https://raw.github.com/wiki/pug-more/mageploy/mageploy_128_noborder.png)
+![Logo of Mageploy](http://pug-more.github.com/mageploy/images/mageploy_128_noborder.png)
 
 Mageploy is an extension for Magento deployment automation based on Admin actions tracking and replication between different project environments.
 
