@@ -219,8 +219,24 @@ Total pending actions: 1
                     
                     <h3>1.4.4 Running pending actions</h3>
                     
+                    <p>Once you have some pending actions to be executed, you can instruct Mageploy to run execute them all to keep different environments aligned. In other words, type:</p>
+
+<pre><code>$ php shell/mageploy.php -r</code></pre>                    
+                    
+                    <p>And you will get something similar to the following:</p>
+                    
+<pre><code>Mageploy v 1.0.0 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
+                    
+//TODO PASTE RESULT HERE                    
+</code></pre>      
+                    <p>Note that you can also run pending actions one by one specifying the action's ID after the <code>run</code> option. <strong>But pay attention:</strong> doing so you run the risk to break the correct sequence in which actions were executed and this can cause problems. If, for example, you run the action that associates an Attribute to an Attribute Set before the Attribute is created, you can imagine that this will cause some errors. So we advice you not to run actions one by one unless you are really sure of what you are doing. We implemented this function mainly for debugging purposes.</p>
+                    
                     <h2>1.5 Summary</h2>
 
+                    <p>Mageploy is really easy to install provided you know what <a href="https://github.com/colinmollenhour/modman" title="Go to Modman project">Modman</a> is and how to use it. Once installed configuration is a matter of flushing Magento's cache and compilation, setting up your username and putting the <em>&lt;magentodir&gt;/var/mageploy/mageploy_all.csv</em> file under version control.</p>
+                    
+                    <p> Once you switch Mageploy's tracking function on, you will get your actions recorded (depending on which trackers are implemented and activated) and have the ability to synchronize different environments running actions executed by others. That's simply done by updating the versioned <em>mageploy_all.csv</em> file and using the Command Line Tool.</p>
+                    
                     <h1>2. Trackers</h1>
 
                     <h2>2.1 About Trackers</h2>
