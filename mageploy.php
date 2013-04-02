@@ -79,7 +79,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
         $args = func_get_args();
         foreach ($args as $arg) {
             $val = $this->getArg($arg);
-            if ($val) break;
+            if ($val !== false) break;
         }
         return $val;
     }
