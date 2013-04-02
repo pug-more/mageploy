@@ -241,10 +241,121 @@ Executed actions: 1/1
                     
                     <h1>2. Trackers</h1>
 
+                    <p>Trackers are a core part of Mageploy and are designed following 
+                    "the Magento way" of doing things. 
+                    Doing so, trackers can easily be added to Mageploy by external 
+                    modules using configuration directives.</p>
+                    
+                    <p>Mageploy comes bundled with some trackers designed to keep track 
+                    of some Magento core functionalities.<br/>
+                    Mageploy, however, can't know in advance the internals of 
+                    custom modules; so trackers of custom modules should be 
+                    implemented by third parties, tipically the same who 
+                    implements the module itself.</p>
+                    
+                    <p>The key functionality for a Tracker is the one of converting 
+                    specific IDs into Universally Unique Identifiers (UUIDs).<br/>
+                    Without this ability, a Tracker couldn't even exist.<br/>In the 
+                    following sections we will describe how we implemented IDs to 
+                    UUIDs conversion for out-of-the-box trackers adding some 
+                    considerations about limitations when needed.</p>
+                    
+                    <p>Converting IDs into UUIDs is done in the <em>encoding</em> 
+                    method which is called every time you invoke a Controller's Action.<br/>
+                    Converting back UUIDs into IDs is done in the <em>decode</em> method
+                    invoked by the Command Line Tool every time it excutes pending actions.<br/>
+                    
+                    <p>At the moment this is all you have to know about
+                        Mageploy's internals in order to understand what's next.<br/>
+                        We will examine all this in more depth in the 
+                        <a href="#extending-mageploy">Extending Mageploy</a> section.</p>
+
                     <h2>2.1 About Trackers</h2>
+                    
+                    <p>When Mageploy was still only an idea in our minds, we needed 
+                    a "proof of concept" which could demonstrate that a tool like
+                    Mageploy could be really useful to developers and, first of all, 
+                    to ourselves.<br/>
+                    So we wrote up a list of "most desirable" Trackers, that is 
+                    a way of listing things that were boring to implement in 
+                    Magento every time we had to start a new project.</p>
+                    
+                    <p>At the top of that list there were Attributes and Attribute Sets.<br/>
+                    Every time a new project starts on Magento, you likely have 
+                    to set up new entities; creating new Attributes and associating them 
+                    to Attribute Sets and Groups is a frequent task. What's also frequent is 
+                    deleting them, changing their options (is it searchable? Is it visible on Frontend?
+                    Is it used for Simple or other kind of Product types? And so on),
+                    assigning them to Sets and Groups etc.</p>
+                    
+                    <p>Best Magento practices impose to do all this thing via source code, 
+                    that is, developing install and upgrade scripts in custom Modules
+                    which programmatically do all the sort of tasks described above.</p>
+                    
+                    <p>But, you know, the knowledge of the entire system comes with 
+                    time and each time you (or your customer) change your mind about some
+                    detail you have to write an upgrade script in order to propagate
+                    these changes.</p>
+                    
+                    <p>Frankly: all this is boring and error prone, especially
+                    considering that Magento comes with a convenient Admin Panel 
+                    which let you easily do this stuff. What's more, delegating the 
+                    creation of such entities to developers means cutting away
+                    store managers and web designers from giving their contribute 
+                    to setting up the store. Not realistic and, from developers' 
+                    point of view, not funny.</p>
+                    
+                    <p>That's where Mageploy comes to hand: you can continue using
+                    the Admin Panel without worrying about propagation and synchronization,
+                    provided a tracker is silently working in the background registering
+                    your actions.</p>                        
 
                     <h2>2.2 Attribute Tracker</h2>
-
+                    
+                    <p>The Attribute Tracker tracks down the action of creating an 
+                        Attribute.</p>
+                    
+                    <p>Implementing its core wasn't so hard because Attributes
+                    comes with a <em>built-in</em> universally unique identifier
+                    (or UUID) which is the Attribute Code. What's more, once you
+                    create an Attribute in Magento Admin Panel, you can't change
+                    its Code so you can be sure that the UUID won't change in time.</p>
+                    
+                    <p>So, encoding and decoding of the IDs is really easy and 
+                        follows the easy rule below:
+                        <ul>
+                            <li><code>Attribute UUID = Attribute Code</code></li>
+                        </ul>
+                    </p>
+                    <p>The hardest part comes when an Attribute has some Options 
+                        associated, beacuse they don't have an immutable identifier.</p>
+                    
+                    <p>In order to make things work we were obliged to do our first 
+                        assumption: <em>Attribute Options Admin values should be immutable</em>.</p>
+                    
+                    <p>Thanks to the above assumption, it's easy to keep track of 
+                        changes to existing options and distinguish them from new 
+                        options created at a later stage.</p>
+                    
+                    <p>Assuming we use a string separator called 
+                        <code>UUID_SEPARATOR</code> in UUIDs that serves the 
+                        function to split different parts while decoding them, the
+                        Options rule is the following:
+                        <ul>
+                            <li><code>Existing Option UUID = 'existing_opt'.UUID_SEPARATOR.'&lt;Option Admin Value&gt;'</code></li>
+                            <li><code>New Option UUID = 'new_opt'.UUID_SEPARATOR.'option_&lt;option_number&gt;'</code></li>
+                        </ul>
+                    </p>
+                    <p>
+                        To decode an existing Option UUIDs we can extract the Admin 
+                        Value and, knowing the Attribute it belongs to, find its specific ID 
+                        (provided, remember the assumption, that the Admin value never changes).
+                    </p>
+                    <p>
+                        From a new Option UUIDs, instead, we simply extract the 'option_&lt;option_number&gt;'
+                        and give it back to the Controller's Action. This way the 
+                        new Option will be generated for the Attrbute the Option belongs to.
+                    </p>
                     <h2>2.3 Attribute Set Tracker</h2>
 
                     <h2>2.4 Category Tracker</h2>
@@ -256,7 +367,8 @@ Executed actions: 1/1
                     <h2>2.7 Static Block Tracker</h2>
 
                     <h2>2.8 Summary</h2>
-
+                    
+                    <a name="extending-mageploy"></a>
                     <h1>3. Extending Mageploy</h1>
 
                     <h2>3.1 Tracker Basics</h2>
