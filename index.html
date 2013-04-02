@@ -19,7 +19,7 @@
 
                 <header>
                     <h1 style="height:210px;text-indent:-9000px;background:transparent url(images/mageploy_256_noborder.png) no-repeat top left;">Mageploy</h1>
-                    <h2>Easily keep track of changes and maintain synchronization between different Magento deployment environments.</h2>
+                    <h2>Easily keep track of changes and deploy synchronization between different Magento environments.</h2>
                 </header>
 
                 <section id="downloads" class="clearfix">
@@ -323,10 +323,10 @@ Executed actions: 1/1
                     
                     <p>So, encoding and decoding of the IDs is really easy and 
                         follows the easy rule below:
+                    </p>
                         <ul>
                             <li><code>Attribute UUID = Attribute Code</code></li>
                         </ul>
-                    </p>
                     <p>The hardest part comes when an Attribute has some Options 
                         associated, beacuse they don't have an immutable identifier.</p>
                     
@@ -341,15 +341,16 @@ Executed actions: 1/1
                         <code>UUID_SEPARATOR</code> in UUIDs that serves the 
                         function to split different parts while decoding them, the
                         Options rule is the following:
+                    </p>
                         <ul>
                             <li><code>Existing Option UUID = 'existing_opt'.UUID_SEPARATOR.'&lt;Option Admin Value&gt;'</code></li>
                             <li><code>New Option UUID = 'new_opt'.UUID_SEPARATOR.'option_&lt;option_number&gt;'</code></li>
                         </ul>
-                    </p>
                     <p>
                         To decode an existing Option UUIDs we can extract the Admin 
-                        Value and, knowing the Attribute it belongs to, find its specific ID 
-                        (provided, remember the assumption, that the Admin value never changes).
+                        Value and, knowing the Attribute it belongs to, find its specific ID. 
+                        This works as far as we respect the assumption of leaving 
+                        the Admin value unchanged over time.
                     </p>
                     <p>
                         From a new Option UUIDs, instead, we simply extract the 'option_&lt;option_number&gt;'
@@ -357,10 +358,52 @@ Executed actions: 1/1
                         new Option will be generated for the Attrbute the Option belongs to.
                     </p>
                     <h2>2.3 Attribute Set Tracker</h2>
+                    
+                    <p>The Attribute Set Tracker tracks down the action of creating a new Attribute Set, creating a new Attribute Group and associating existing Attributes to a (new or existing) Group of a (new or existing) Attribute Set.</p>
+                    
+                    <p>This was our real proof of concept for Mageply because here
+                        difficulty scales up a bit. That's dued to the fact that
+                        in some circumstances we can't rely on an explicit 
+                        UUIDs like the Attribute Code.</p>
+                    
+                    <p>As far as we have to deal with creating a new Attribute Sets, 
+                        things are simple because Magento requires that
+                    different Attribute Sets should have different names, so:</p>
+                    <ul>
+                        <li><code>Attribute Set UUID = Attribute Set Name</code></li>
+                    </ul>
+                    
+                    <p>From now on, we split topics into sub topics because on an 
+                        Attribute Set you can associate Attribute to Groups, create
+                        new Groups, remove the association between an Attribute
+                        and a Group and remove Groups.</p>
+                    
+                    <h3>2.3.1 Associatig Attributes to Groups</h3>
+                    
+                    <p>The structure we have to deal when handling the association 
+                        of each Attribute to Groups is a list of indexed arrays like the following:</p>
+                    
+<pre><code>0 => &lt;attribute_id&gt;
+1 => &lt;attribute_group_id&gt;
+2 => &lt;sort_order&gt;
+3 => &lt;eav_attribute_id&gt; //empty if it's a new association</code></pre>
+                    
+                    <p>So here we have to convert different IDs into UUIDs:</p>
+                    
+                    <ul>
+                        <li><code>Attribute UUID = Attribute Code</code></li>
+                        <li><code>Existing Attribute Group UUID = Attribute Group Name . UUID_SEPARATOR . Attribute Set Name</code></li>
+                        <li><code>New Attribute Group UUID = the &lt;attribute_group_id&gt; value in the array</code></li>
+                        <li><code>EAV Attribute UUID = Attribute Group UUID . UUID_SEPARATOR . Attribute UUID</code></li>
+                    </ul>
+                    
+                    <h3>2.3.2 Creating Groups</h3>
+                    <h3>2.3.3 Removing Attributes from Groups</h3>
+                    <h3>2.3.4 Removing Groups</h3>
+                    
+                    <h2>2.4 Category Tracker (uncomplete)</h2>
 
-                    <h2>2.4 Category Tracker</h2>
-
-                    <h2>2.5 System Config Tracker</h2>
+                    <h2>2.5 System Config Tracker (uncomplete/experimental)</h2>
 
                     <h2>2.6 CMS Page Tracker</h2>
 
