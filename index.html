@@ -359,7 +359,10 @@ Executed actions: 1/1
                     </p>
                     <h2>2.3 Attribute Set Tracker</h2>
                     
-                    <p>The Attribute Set Tracker tracks down the action of creating a new Attribute Set, creating a new Attribute Group and associating existing Attributes to a (new or existing) Group of a (new or existing) Attribute Set.</p>
+                    <p>The Attribute Set Tracker tracks down the action of creating 
+                        and updating an Attribute Set, creating and updating an 
+                        Attribute Group and associating existing Attributes to a 
+                        (new or existing) Group of a (new or existing) Attribute Set.</p>
                     
                     <p>This was our real proof of concept for Mageply because here
                         difficulty scales up a bit. That's dued to the fact that
@@ -397,7 +400,39 @@ Executed actions: 1/1
                         <li><code>EAV Attribute UUID = Attribute Group UUID . UUID_SEPARATOR . Attribute UUID</code></li>
                     </ul>
                     
-                    <h3>2.3.2 Creating Groups</h3>
+                    <h3>2.3.2 Creating and Updating Groups</h3>
+                    
+                    <p>The structure we have to deal when handling the creation of Groups is a list of indexed arrays like the following:</p>
+                    
+<pre><code>0 => &lt;attribute_group_id&gt; or "ynode-&lt;NUM&gt;" for a new Group
+1 => &lt;attribute_group_name&gt;
+2 => &lt;sort_order&gt;</code></pre>
+                    
+                    <p>So, the only ID we have to convert is the one of the Group. 
+                        Using the name can't be sufficient, as Attribute Groups 
+                        within different Attribute Sets can have the same name.<br/>
+                        For this reason we concatenate the Group Name and the 
+                        Attrbute Set Name as the latter can't be repeated for 
+                        the same <em>entity type</em> (the Product, in current scope):
+                    </p>
+                    
+                    <ul>
+                        <li><code>Attribute Group UUID = Attribute Group Name . UUID_SEPARATOR . Attribute Set Name</code></li>
+                    </ul>
+                    
+                    <p>Note that as we load the Attribute Group from the DB, 
+                        changing the name of the Group is possible even if it's
+                        part of the UUID.<br/>That's because in environments where 
+                        the action of renaming the Attribute Group hasn't been 
+                        run yet, the Group Name is the one in the UUID, so the
+                        Group can be identified. Provided no one renames the same
+                        Group in the same time but this would be considered a 
+                        <em>conflict</em> and conflicts can't be resolved by
+                        Mageploy; humans, in this case, have to step in and do
+                        their part.</p>
+                    
+                    <p></p>
+                    
                     <h3>2.3.3 Removing Attributes from Groups</h3>
                     <h3>2.3.4 Removing Groups</h3>
                     
