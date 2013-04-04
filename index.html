@@ -312,8 +312,8 @@ Executed actions: 1/1
 
                     <h2>2.2 Attribute Tracker</h2>
                     
-                    <p>The Attribute Tracker tracks down the action of creating an 
-                        Attribute.</p>
+                    <p>The Attribute Tracker tracks down the action of creating 
+                        and updating an Attribute.</p>
                     
                     <p>Implementing its core wasn't so hard because Attributes
                     comes with a <em>built-in</em> universally unique identifier
@@ -467,6 +467,95 @@ Executed actions: 1/1
                     
                     <h2>2.4 Category Tracker (uncomplete)</h2>
 
+                    <p>The Category Tracker tracks down the action of creating 
+                        and updating a Category.<br/>
+                        This Tracker is not complete in Mageploy v 1.0.0 because 
+                        it doesn't track the Thumbnail and the Image uploads.</p>
+                    
+                    <p>We didn't deal with handling uploads at all in 
+                        Mageploy 1.0.0; it will be certainly part of the very next 
+                        improvements we have in mind.</p>
+                    
+                    <p>The Category Tracker wasn't as complex to implement as the
+                    Attribute Set one but we had to deal with several topics:</p>
+                    
+                    <ul>
+                        <li>Category ID</li>
+                        <li>Store ID</li>
+                        <li>Parent Category ID</li>
+                        <li>Associated Products</li>
+                        <li>Moving of the Category in the hierarchy</li>
+                    </ul>
+                    
+                    <p>From now on, we split the above topics into sub topics in 
+                        order to keep things more clear.</p>
+                    
+                    <h3>2.4.1 Category ID</h3>
+                    
+                    <p>Categories in Magento don't have a unique code out of the 
+                        box as Attributes do. What's more, you are allowed to create
+                        two or more Categories with the same name under the same
+                        parent Category.</p>
+                    
+                    <p>In order to be able to convert a Category ID into a
+                    Category UUID we had to assume that Categories 
+                    with the same parent Category won't ever have the same name.</p>
+                    
+                    <p>Maybe it could have been easier to use the Category URL 
+                        as UUID but we didn't want to deal with URL rewrites and 
+                        chose to use a different algorithm.</p>
+                    
+                    <p>Provided we don't have to convert the ID for new Categories,
+                        for existing ones the UUID is the concatenation
+                        of the name of all the Categories in the Category path, ending
+                        with current Category name.</p>
+
+                    <ul>
+                        <li><code>Category UUID = Full Named Path</code></li>
+                    </ul>
+                    
+                    <p>In fact, assuming that there will never be two Categories 
+                    with the same name under the same parent Category, such a path
+                    will uniquely identify a Category.</p>
+
+                    <h3>2.4.2 Store ID</h3>
+                    
+                    <p>Identifying a UUID from a Store ID is a trivial taks because
+                    Stores have unique codes in Magento, so:</p>
+                    
+                    <ul>
+                        <li><code>Store UUID = Store Code</code></li>
+                    </ul>
+                    
+                    <h3>2.4.3 Parent Category ID</h3>
+                    
+                    <p>For the parent Category ID, refer to the conversion used 
+                        for the Category ID in Paragraph 2.4.1.</p>
+                    
+                    <h3>2.4.4 Associated Products</h3>
+                    
+                    <p>Producs you associate to a Category through the "Category
+                    Products" tab are passed as <code>product_id=position</code> string segments 
+                    concatenated with an <code>&amp;</code> character; here is an example:</p>
+                    
+                    <code>1=0&11=1&12=2&13=3"</code>
+                    
+                    <p>So, converting such a string is a matter of converting 
+                        each Product ID into a Product UUID and this is quite easy because
+                        Products have a native unique identifier represented by the
+                        <em>SKU</em>, so:</p>
+
+                    <ul>
+                        <li><code>Product UUID = Product SKU</code></li>
+                    </ul>
+                    
+                    <h3>2.4.5 Moving of the Category in the hierarchy</h3>
+                    
+                    <p>Moving a Category in the hierarchy means handling information 
+                        about the new parent Category and the Category after which
+                    current Category has to be placed. So we are again in the case of
+                    converting a Category ID and you can refer to paragraph 2.4.1.</p>
+                    
                     <h2>2.5 System Config Tracker (uncomplete/experimental)</h2>
 
                     <h2>2.6 CMS Page Tracker</h2>
