@@ -135,7 +135,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                 }
                 printf("\r\nTotal global actions listed: %d\r\n", count($historyList));
             } else {
-                printf("There aren't any pending actions to execute.\r\n");
+                printf("There aren't any actions tracked.\r\n");
             }
         } else if ($id = $this->getArgs('r', 'run')) {
             $this->_printHeader($doTracking);
