@@ -47,3 +47,10 @@ So many more trackers should be developed for:
 * Transactional Emails
 * Stores
 * Order Statuses
+
+RELEASE NOTES
+-------------
+Here we keep track of major changes between different versions.
+
+* 1.0.1 - fixed bug in CMS Blocks tracking: saving existing blocks didnt' work because encoding/decoding ignored block_id parameter.
+* 1.0.0 - first release

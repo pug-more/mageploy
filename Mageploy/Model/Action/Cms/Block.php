@@ -32,6 +32,12 @@ class PugMoRe_Mageploy_Model_Action_Cms_Block extends PugMoRe_Mageploy_Model_Act
         if ($this->_request) {
             $params = $this->_request->getParams();
             
+            // convert block_id
+            // for now assuming no two blocks using the same identifier
+            if (isset($params['block_id'])) {
+                $params['block_id'] = $params['identifier'];
+            }
+            
             // convert store ids
             foreach ($params['stores'] as $i => $storeId) {
                 $storeUuid = Mage::app()->getStore($storeId)->getCode();
@@ -58,6 +64,15 @@ class PugMoRe_Mageploy_Model_Action_Cms_Block extends PugMoRe_Mageploy_Model_Act
 
     public function decode($encodedParameters) {
         $parameters = $this->_decodeParams($encodedParameters);
+        
+        // convert block_id
+        // for now assuming no two blocks using the same identifier
+        if (isset($parameters['block_id'])) {
+            $block = Mage::getModel('cms/block')->load($parameters['block_id'], 'identifier');
+            if ($block->getId()) {
+                $parameters['block_id'] = $block->getId();
+            }
+        }
         
         // convert store ids
         foreach ($parameters['stores'] as $i => $storeUuid) {
