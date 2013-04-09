@@ -1,5 +1,3 @@
-![Logo of Mageploy](http://pug-more.github.com/mageploy/images/mageploy_128_noborder.png)
-
 Mageploy is an extension for Magento deployment automation based on Admin actions tracking and replication between different project environments.
 
 How does it work?
@@ -17,7 +15,7 @@ Once you install mageploy and activate tracking (active by default), Mageploy's 
 
 Once you commit and push your changes you will also push the **mageploy_all.csv**. Developers which will pull your changes will get the global list of actions updated and can replicate missing invocations by using the command line tool **shell/mageploy.php**.
 
-To learn more about Mageploy, please refer to the Documentation on the  [Official Website](http://pug-more.github.com/mageploy/).
+To learn more about Mageploy, please refer to the Documentation on the  [Official Website](http://www.mageploy.com/).
 
 AS-IS
 -----
