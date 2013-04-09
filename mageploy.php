@@ -144,7 +144,6 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                         if (class_exists($controllerClassName)) {
                             $actionExecutor = new $actionExecutorClass();
                             $parameters = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_PARAMS];
-                            $messages = $session->getMessages(clear);
                             try {
                                 $request = $actionExecutor->decode($parameters, $actionExecutorVersion);
                                 $controller = new $controllerClassName($request, new Mage_Core_Controller_Response_Http());
@@ -153,11 +152,11 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                                 $controller->$action();
                                 $controller->postDispatch();
                             } catch (Exception $e) {
-                                $msg = Mage::getSingleton('core/message')->error($e->getMessage());
-                                $messages->add($msg);
+                                $session->addError($e->getMessage());
                             }
 
                             // Add messages in body response in case of Ajax requests
+                            $messages = $session->getMessages(true);
                             if ($request && $request->getParam('isAjax', false)) {
                                 $body = $controller->getResponse()->getBody();
                                 $msg = Mage::getSingleton('core/message')->notice($body);
