@@ -13,6 +13,7 @@ abstract class PugMoRe_Mageploy_Model_Action_Abstract {
     const INDEX_CONTROLLER_NAME     = 5;
     const INDEX_ACTION_NAME         = 6;
     const INDEX_ACTION_PARAMS       = 7;
+    const INDEX_VERSION             = 8;
     
     const UUID_SEPARATOR = '~';
     
@@ -22,6 +23,8 @@ abstract class PugMoRe_Mageploy_Model_Action_Abstract {
      * @var Mage_Core_Controller_Request_Http
      */
     protected $_request;
+    
+    protected abstract function _getVersion();
     
     protected function _encodeParams($params) {
         return base64_encode(serialize($params));
@@ -52,8 +55,6 @@ abstract class PugMoRe_Mageploy_Model_Action_Abstract {
         return $result;
     }
     
-    public function decode($encodedParameters) {
-        
-    }
+    public abstract function decode($encodedParameters);
     
 }

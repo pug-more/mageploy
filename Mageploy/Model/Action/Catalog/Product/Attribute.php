@@ -7,9 +7,15 @@
  */
 class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Mageploy_Model_Action_Abstract {
 
+    const VERSION = '1';
+    
     protected $_code = 'catalog_product_attribute';
     protected $_blankableParams = array('key', 'form_key', 'back', 'tab');
 
+    protected function _getVersion() {
+        return Mage::helper('pugmore_mageploy')->getVersion(2).'.'.self::VERSION;
+    }
+    
     protected function _getOptionIdByUuid($optionUuid, &$attributeOptionsByValue, &$newOptions)
     {
         $id = 0;
@@ -175,6 +181,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
             $result[self::INDEX_ACTION_NAME] = $this->_request->getActionName();
             $result[self::INDEX_ACTION_PARAMS] = $this->_encodeParams($params);
             $result[self::INDEX_ACTION_DESCR] = sprintf("%s %s Attribute with UUID '%s'", ucfirst($this->_request->getActionName()), ($isNew ? 'new' : 'existing'), $attributeUuid);
+            $result[self::INDEX_VERSION] = $this->_getVersion();
         } else {
             $result = false;
         }
@@ -184,7 +191,13 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
     /*
      * return Mage_Core_Controller_Request_Http
      */
-    public function decode($encodedParameters) {
+    public function decode($encodedParameters, $version) {
+        // The !empty() ensures that rows without a version number can be 
+        // executed (not without any risk).
+        if (!empty($version) && $this->_getVersion() != $version) {
+            throw new Exception(sprintf("Can't decode the Action encoded with %s Tracker v %s; current Block Tracker is v %s ", $this->_code, $version, $this->_getVersion()));
+        }
+
         $parameters = $this->_decodeParams($encodedParameters);
         #$attributeCode = $parameters['mageploy_uuid'];
         if (isset($parameters['attribute_code'])) {

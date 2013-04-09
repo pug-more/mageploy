@@ -28,34 +28,13 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     }
 
     private function __getVersion() {
-        return Mage::getConfig()->getNode('modules/PugMoRe_Mageploy/version');
+        return Mage::helper('pugmore_mageploy')->getVersion();
     }
 
     protected function _initSession() {
         $userModel = Mage::getModel('admin/user');
         $userModel->setUserId(0);
         Mage::getSingleton('admin/session')->setUser($userModel);
-        /*
-          $session = Mage::getSingleton('admin/session');
-          try {
-          $user = Mage::getModel('admin/user');
-          $user->login('admin_username', 'admin_password');
-          if ($user->getId()) {
-          $session->renewSession();
-
-          if (Mage::getSingleton('adminhtml/url')->useSecretKey()) {
-          Mage::getSingleton('adminhtml/url')->renewSecretUrls();
-          }
-          $session->setIsFirstPageAfterLogin(true);
-          $session->setUser($user);
-          $session->setAcl(Mage::getResourceModel('admin/acl')->loadAcl());
-          } else {
-          Mage::throwException(Mage::helper('adminhtml')->__('Invalid User Name or Password.'));
-          }
-          } catch (Mage_Core_Exception $e) {
-          Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-          }
-         */
     }
 
     protected function _construct() {
@@ -151,6 +130,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                     }
 
                     $actionExecutorClass = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_EXECUTOR_CLASS];
+                    $actionExecutorVersion = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_VERSION];
                     $controllerModule = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_CONTROLLER_MODULE];
                     $controllerName = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_CONTROLLER_NAME];
                     $controllerClassName = $this->_getControllerClassName($controllerModule, $controllerName);
@@ -164,16 +144,21 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                         if (class_exists($controllerClassName)) {
                             $actionExecutor = new $actionExecutorClass();
                             $parameters = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_PARAMS];
-                            $request = $actionExecutor->decode($parameters);
-                            $controller = new $controllerClassName($request, new Mage_Core_Controller_Response_Http());
-                            $action = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_NAME] . 'Action';
-                            $controller->preDispatch();
-                            $controller->$action();
-                            $controller->postDispatch();
-
                             $messages = $session->getMessages(clear);
+                            try {
+                                $request = $actionExecutor->decode($parameters, $actionExecutorVersion);
+                                $controller = new $controllerClassName($request, new Mage_Core_Controller_Response_Http());
+                                $action = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_NAME] . 'Action';
+                                $controller->preDispatch();
+                                $controller->$action();
+                                $controller->postDispatch();
+                            } catch (Exception $e) {
+                                $msg = Mage::getSingleton('core/message')->error($e->getMessage());
+                                $messages->add($msg);
+                            }
+
                             // Add messages in body response in case of Ajax requests
-                            if ($request->getParam('isAjax', false)) {
+                            if ($request && $request->getParam('isAjax', false)) {
                                 $body = $controller->getResponse()->getBody();
                                 $msg = Mage::getSingleton('core/message')->notice($body);
                                 $messages->add($msg);
@@ -211,6 +196,11 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                     $_GET = array();
                     $_POST = array();
                     $_REQUEST = array();
+                    
+                    // And don't forget to reinitialize Magento to avoid 
+                    // problems with already populated objects (i.e. registry)
+                    Mage::reset();
+                    Mage::init($this->_appCode, $this->_appType);
                 }
                 printf("\r\nExecuted actions: %d/%d\r\n", $executed, count($pendingList));
             } else {

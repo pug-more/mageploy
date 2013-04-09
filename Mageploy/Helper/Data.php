@@ -13,6 +13,25 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract {
         Mage::app()->cleanCache(array(Mage_Core_Model_Config::CACHE_TAG));
     }
     
+    /**
+     * Get current Mageploy version from config.xml;
+     * 
+     * @param type $len if a value is passed, return a portion of the version 
+     * numbers counting from the first one up to $len
+     * 
+     * @return string
+     */
+    public function getVersion($len = null) {
+        $ver = Mage::getConfig()->getNode('modules/PugMoRe_Mageploy/version');
+        if (is_numeric($len)) {
+            $numbers = explode('.', $ver);
+            if ($len < count($numbers)) {
+                $ver = join('.', array_slice($numbers, 0, $len));
+            }
+        }
+        return $ver;
+    }
+    
     public function log($msg) {
         $args = func_get_args();
         $formattedMsg = call_user_func_array('sprintf', $args);
