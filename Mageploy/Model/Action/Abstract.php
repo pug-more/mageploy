@@ -55,6 +55,6 @@ abstract class PugMoRe_Mageploy_Model_Action_Abstract {
         return $result;
     }
     
-    public abstract function decode($encodedParameters);
+    public abstract function decode($encodedParameters, $version);
     
 }
