@@ -26,7 +26,7 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract {
         if (is_numeric($len)) {
             $numbers = explode('.', $ver);
             if ($len < count($numbers)) {
-                $ver = join('.', array_slice($numbers, 0, $len));
+                $ver = implode('.', array_slice($numbers, 0, $len));
             }
         }
         return $ver;

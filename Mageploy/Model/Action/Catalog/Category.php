@@ -31,7 +31,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
 
     protected function _getCategoryUuidFromPath($path, $append = null) {
         $categoryUuidParts = array();
-        $categoryIdParts = split('/', $path);
+        $categoryIdParts = explode('/', $path);
         foreach ($categoryIdParts as $i => $catId) {
             if ($i == 0) {
                 $categoryUuidParts[] = Mage_Catalog_Model_Category::TREE_ROOT_ID;
@@ -42,7 +42,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
         if ($append) {
             $categoryUuidParts[] = $append;
         }
-        return join(self::UUID_SEPARATOR, $categoryUuidParts);
+        return implode(self::UUID_SEPARATOR, $categoryUuidParts);
     }
 
     /*
@@ -60,7 +60,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
 
     protected function _getCategoryPathFromUuid($uuid) {
         $pathParts = array();
-        $categoryPathParts = split(self::UUID_SEPARATOR, $uuid);
+        $categoryPathParts = explode(self::UUID_SEPARATOR, $uuid);
         foreach ($categoryPathParts as $i => $catUuid) {
             if ($i == 0) {
                 $pathParts[] = Mage_Catalog_Model_Category::TREE_ROOT_ID;
@@ -69,7 +69,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
                 $pathParts[] = $category->getId();
             }
         }
-        return join('/', $pathParts);
+        return implode('/', $pathParts);
     }
 
     public function match() {
@@ -141,14 +141,14 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
             $params['parent'] = $parentUuid;
 
             // Associated Products
-            $associatedProductIds = split('&', $params['category_products']);
+            $associatedProductIds = explode('&', $params['category_products']);
             $associatedProductUuids = array();
             foreach ($associatedProductIds as $i => $association) {
                 list($id, $position) = explode('=', $association);
                 $prod = Mage::getModel('catalog/product')->load($id);
                 $associatedProductUuids[] = sprintf("%s=%d", $prod->getSku(), $position);
             }
-            $params['category_products'] = join('&', $associatedProductUuids);
+            $params['category_products'] = implode('&', $associatedProductUuids);
 
             // General
             if (isset($params['general']['id'])) {
@@ -233,14 +233,14 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
         }
          
         // Associated Products
-        $associatedProductUuids = split('&', $parameters['category_products']);
+        $associatedProductUuids = explode('&', $parameters['category_products']);
         $associatedProductIds = array();
         foreach ($associatedProductUuids as $i => $association) {
             list($sku, $position) = explode('=', $association);
             $id = Mage::getModel('catalog/product')->getIdBySku($sku);
             $associatedProductIds[] = sprintf("%s=%d", $id, $position);
         }
-        $parameters['category_products'] = join('&', $associatedProductIds);
+        $parameters['category_products'] = implode('&', $associatedProductIds);
 
         // General
         if (isset($parameters['general']['id'])) {

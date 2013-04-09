@@ -54,6 +54,7 @@ A change in the third version number part indicates minor changes or fixes.
 
 A change in the second version number part indicates changes in CSV format which implies that previous encoded CSVs could not be decoded any more.
 
+* 1.1.3 - replaced deprecated join and split functions with equivalent implode and explode.
 * 1.1.2 - fix on displaying of error messages while executing actions.
 * 1.1.1 - fix on decode() declaration in Abstract class.
 * 1.1.0 - changed encoding/decoding for Block tracking; added code to reset Magento at every Action execution to avoid issues with objects in memory, like the Register. Added Tracket version control to prevent decoding of rows encoded with a different version of a Tracker.

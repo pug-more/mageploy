@@ -49,7 +49,7 @@ class PugMoRe_Mageploy_Model_Action_Cms_Block extends PugMoRe_Mageploy_Model_Act
             if (isset($params['block_id'])) {
                 $new = 'existing';
                 $params['block_id'] = $params['identifier'] . self::UUID_SEPARATOR 
-                        . join(self::UUID_SEPARATOR, $params['stores']);
+                        . implode(self::UUID_SEPARATOR, $params['stores']);
             }
             
             foreach ($this->_blankableParams as $key) {
@@ -88,8 +88,8 @@ class PugMoRe_Mageploy_Model_Action_Cms_Block extends PugMoRe_Mageploy_Model_Act
         
         // convert block UUID
         if (isset($parameters['block_id'])) {
-            list($identifier, $joinedStoreCodes) = split(self::UUID_SEPARATOR, $parameters['block_id'], 2);
-            $storeCodes = split(self::UUID_SEPARATOR, $joinedStoreCodes);
+            list($identifier, $joinedStoreCodes) = explode(self::UUID_SEPARATOR, $parameters['block_id'], 2);
+            $storeCodes = explode(self::UUID_SEPARATOR, $joinedStoreCodes);
             $storeId = Mage::app()->getStore($storeCodes[0])->getId();
             
             $block = Mage::getModel('cms/block')->getCollection()
