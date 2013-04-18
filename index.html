@@ -90,7 +90,7 @@
 
                     <p>At this point you should see something similar to the following</p>
 
-<pre><code>Mageploy v 1.0.0 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
+<pre><code>Mageploy v 1.1.3 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
 There aren't any pending actions to execute.
 </code></pre>
 
@@ -114,7 +114,7 @@ There aren't any pending actions to execute.
                     
                     <p>The result will be somthing like the following:</p>
                     
-<pre><code>Mageploy v 1.0.0 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
+<pre><code>Mageploy v 1.1.3 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
 
 Usage:	php mageploy.php --[options]
 
@@ -153,7 +153,7 @@ Usage:	php mageploy.php --[options]
 
                     <p>If you have tracked something so far, you should obtain something like:</p>
 
-<pre><code>Mageploy v 1.0.0 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
+<pre><code>Mageploy v 1.1.3 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
 
 Global Actions list:
 ID: 1	 - Save existing Attribute Set with UUID 'Test Group' (aronchi on Thu Mar 14 11:25:25 2013)
@@ -180,7 +180,7 @@ Total global actions listed: 16
                     
 <pre><code>$ php shell/mageploy.php -hi 5</code></pre>
 
-<pre><code>Mageploy v 1.0.0 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
+<pre><code>Mageploy v 1.1.3 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
 
 Global Actions list:
 ID: 12	 - Save Static Block 'another-sample-page' (aronchi on Thu Mar 14 14:05:22 2013)
@@ -193,7 +193,7 @@ Total global actions listed: 5
 </code></pre>
                     
                     <p>In case you never tracked anything before, you will simply get:</p>
-<pre><code>Mageploy v 1.0.0 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
+<pre><code>Mageploy v 1.1.3 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
 
 There aren't any actions tracked.
 </code></pre>
@@ -207,7 +207,7 @@ There aren't any actions tracked.
                     
                     <p>Something similar to the following could appear:</p>
 
-<pre><code>Mageploy v 1.0.0 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
+<pre><code>Mageploy v 1.1.3 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
                     
 Pending Actions list:
 ID: 17	 - Save existing CMS Page 'about-us' (rgambuzzi on Thu Mar 15 15:17:47 2013)
@@ -225,7 +225,7 @@ Total pending actions: 1
                     
                     <p>And you will get something similar to the following:</p>
                     
-<pre><code>Mageploy v 1.0.0 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
+<pre><code>Mageploy v 1.1.3 - <span style="color:red">tracking is not active</span> - <span style="color:green">user is aronchi</span>
                     
 Action ID #17 - <span style="color:green">success</span> The page has been saved.
 
@@ -469,7 +469,7 @@ Executed actions: 1/1
 
                     <p>The Category Tracker tracks down the action of creating 
                         and updating a Category.<br/>
-                        This Tracker is not complete in Mageploy v 1.0.0 because 
+                        This Tracker is not complete in Mageploy v 1.1.3 because 
                         it doesn't track the Thumbnail and the Image uploads.</p>
                     
                     <p>We didn't deal with handling uploads at all in 
@@ -557,23 +557,93 @@ Executed actions: 1/1
                     converting a Category ID and you can refer to paragraph 2.4.1.</p>
                     
                     <h2>2.5 System Config Tracker (uncomplete/experimental)</h2>
+                    
+                    <p>The System Config Tracker in Mageploy v 1.1.3 is not 
+                        intended to be fully functional. The Magento System 
+                        Config is a complex set of configuration sections, each 
+                        of which should be deeply analyzed. For each section a
+                        specific tracker should be written in order to do things
+                        the right way.</p>
+                    
+                    <p>Instead, at the moment, the System Config Tracker 
+                        consists of a single tracker which doesn't convert any 
+                        ID but simply encodes and decodes posted values as is.</p>
+
+                    <p>Despite this big limitation, the System Config Tracker 
+                        can be very useful to track changes of a lot of config 
+                        values which are intrinsically independent from specific
+                        IDs.</p>
 
                     <h2>2.6 CMS Page Tracker</h2>
+                    
+                    <p>The CMS Page Tracker tracks down the action of creating 
+                        and updating a CMS Page.</p>
+                    
+                    <p>This tracker wasn't complex to implement; the only 
+                        aspect we had to deal with carefully was the 
+                        association of a Page to one ore more Store Views and, 
+                        thus, the conversion of Store IDs through the following 
+                        rule:
+                    </p>
+                    
+                    <ul>
+                        <li><code>Store UUID = Store Code</code></li>
+                    </ul>
 
                     <h2>2.7 Static Block Tracker</h2>
+                    
+                    <p>The Static Block Tracker tracks down the action of creating 
+                        and updating a Static Block.</p>
+                    
+                    <p>Its implementation is equivalent to the CMS Page Tracker, 
+                        so you can refer to it for further details.</p>
 
                     <h2>2.8 Summary</h2>
                     
+                    <p>Trackers are the pieces of code which let Mageploy record
+                        actions which can be rerun on different environments
+                        via the Command Line Tool in order to keep things 
+                        synchronized.</p>
+                    
+                    <p>In this section we explained the basic algorithms 
+                        undergoing the built-in Trackers in order to give you a 
+                        reference for the development of new Trackers.</p>
+                    
                     <a name="extending-mageploy"></a>
                     <h1>3. Extending Mageploy</h1>
+                    
+                    <p>As we mentioned above, Mageploy is developed "the Magento 
+                        way" meaning that you can extend Mageploy and 
+                        deploy your own Trackers.</p>
+                    
+                    <p>Trackers can be built inside Mageploy's module or inside
+                        your own module simply by extending a Configuration node 
+                        and registering your own classes.</p>
+                    
+                    <p>Our idea is that Trackers dealing with Magento's core 
+                        functionalities should be delivered directly as
+                        Mageploy's built-in Trackers meanwhile third party 
+                        Modules could provide their own Trackers.</p>
+                    
+                    <p>Provided that third party Trackers are not mandatory, once 
+                        you begin working with Mageploy you will desire to have 
+                        a Tracker for every section. Count on it.</p>
 
                     <h2>3.1 Tracker Basics</h2>
+                    
+                    <p>This section still to be covered.</p>
 
                     <h2>3.2 Adding a Tracker</h2>
 
+                    <p>This section still to be covered.</p>
+                    
                     <h2>3.3 Developing a Tracker</h2>
 
+                    <p>This section still to be covered.</p>
+                    
                     <h2>3.4 Summary</h2>
+                    
+                    <p>This section still to be covered.</p>
                 </section>
 
                 <footer>
