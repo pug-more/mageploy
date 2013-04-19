@@ -250,7 +250,7 @@ Executed actions: 1/1
                     of some Magento core functionalities.<br/>
                     Mageploy, however, can't know in advance the internals of 
                     custom modules; so trackers of custom modules should be 
-                    implemented by third parties, tipically the same who 
+                    implemented by third parties, typically the same who 
                     implements the module itself.</p>
                     
                     <p>The key functionality for a Tracker is the one of converting 
@@ -631,19 +631,597 @@ Executed actions: 1/1
 
                     <h2>3.1 Tracker Basics</h2>
                     
-                    <p>This section still to be covered.</p>
+                    <p>Before explaining how Trackers work let's explain how
+                        they are activated.</p>
+                    
+                    <h3>3.1.1 The Request Observer</h3>
+                    
+                    <p>The tracking functionality is based upon an Observer's 
+                        method, <code>observeRequest()</code>, which is invoked
+                        each time Magento dispatches the 
+                        <code>controller_action_predispatch</code> event.
+                    </p>
+                    
+                    <p>The <code>observeRequest()</code>, implementation is very 
+                        simple as shown below:
+                    </p>
+                    
+<pre><code>public function observeRequest($observer) {
+    $helper = Mage::helper('pugmore_mageploy');
+    if (!$helper->isActive()) {
+        return;
+    }
 
+    $request = Mage::app()->getRequest();
+    $funnel = Mage::getModel('pugmore_mageploy/request_funnel')
+            ->init(Mage::getSingleton('pugmore_mageploy/io_file'))
+            ->dispatch($request);
+}
+</code></pre>                    
+                    
+                    <p>The first code block checks whether tracking is active; 
+                        if not nothing has to be done. Easy.</p>
+                    
+                    <p>The second code block instantiates the so called 
+                        "Request Funnel" object, injects into it the object 
+                        responsible of writing things into files and calls the
+                        <code>dispatch()</code> method, passing the Request 
+                        Object as its only parameter. Done. Easy too.</p>
+                    
+                    <p>The reason why the I/O object is injected is that we 
+                        didn't want to bound Mageploy to the initial decision 
+                        of using files to synchronize things. If one day another
+                        better method will arise, we can simply change the object
+                        responsible of writing things and all should continue
+                        working without worrying about what comes after the 
+                        <code>dispatch()</code> invocation. This way of doing 
+                        things is named "Dependency Injection" and follows the 
+                        "Inversion of Control" design pattern which we are great 
+                        fan of. Magento is not implemented this way but Magento 2 
+                        is, and this is a good piece of news.</p>
+
+                    <h3>3.1.2 The Request Funnel</h3>
+                    
+                    <p>The Request Funnel object is responsible of taking the 
+                        HTTP Request object, checking Magento configuration to 
+                        retrieve and instantiate all the Trackers which can be 
+                        interested in the action being submitted and, for each 
+                        of them, calling their <code>encode()</code> method.
+                    </p>
+                    
+                    <p>The <code>encode()</code> method of each Tracker will
+                        return the result which the I/O injected Object is 
+                        responsible to store.</p>
+                    
+                    <p>Even if more than a Tracker can be activated upon an 
+                        action submission, at the moment the Trackers we developed
+                        react once at a time.<br/>
+                        The tracking of the System Configuration, if developed 
+                        the right way, is a good candidate to expose more than a 
+                        Tracker reacting at the same time to a same action 
+                        submission. But actually it is not.</p>
+                    
+                    <p>The Request Funnel logic con be divided into two main 
+                        blocks: the initialization one and the dispatching/recording one.</p>
+                    
+                    <p>The <code>init()</code> method's implementation is shown 
+                        below:</p>
+                    
+<pre><code>public function init($io) {
+    $this->_io = $io;
+
+    Mage::dispatchEvent('mageploy_funnel_collect_actions_before', array('funnel'=>$this));
+
+    $actionsInfo =  Mage::getConfig()->getNode(self::XML_ACTIONS_PATH)->asArray();
+
+    Varien_Profiler::start('mageploy::funnel::collect_actions');
+    foreach ($actionsInfo as $actionCode => $actionInfo) {
+        if (isset($actionInfo['disabled']) && $actionInfo['disabled']) {
+            continue;
+        }
+        if (isset($actionInfo['class'])) {
+            $action = new $actionInfo['class'];
+            $this->addAction($actionCode, $action);
+        }
+    }
+    Varien_Profiler::stop('mageploy::funnel::collect_actions');
+
+    Mage::dispatchEvent('mageploy_funnel_collect_actions_after', array('funnel'=>$this));
+
+    return $this;
+}</code></pre>
+                    
+                    <p>It's a very simple block of code, mainly inspired by the 
+                        <code>init()</code> method of the 
+                        <code>Mage_Core_Controller_Varien_Front</code> class.</p>
+                    
+                    <p>It simply access Magento Configuration nodes in order to
+                        collect all registered trackers. Once a Tracker node is 
+                        found and provided it's not disabled and is associated 
+                        to a class it's stored in a protected list that will be 
+                        iterated during the dispatching/recording phase.</p>
+                    
+                    <p>The <code>dispatch()</code> method's implementation is
+                    ridiculously simple as shown below:</p>
+                    
+<pre><code>public function dispatch($request)
+{
+    foreach ($this->getActions() as $action) {
+        if ($action->setRequest($request)->match()) {
+
+            $this->record($action);
+        }
+    }
+}</code></pre>
+                    
+                    <p>The <code>dispatch()</code> method iterates the list of
+                        collected Trackers and invoke their <code>record()</code>
+                        method.</p>
+                    
+                    <p>The <code>record()</code> method's implementation is
+                    very simple too, as shown below:</p>
+
+<pre><code>public function record($action) {
+    Mage::dispatchEvent('mageploy_funnel_record_action_before', array('funnel'=>$this, 'action'=>$action));
+
+    Varien_Profiler::start('mageploy::funnel::record_action');
+
+    Mage::helper('pugmore_mageploy')->log("Should record '%s'", $action->toString());
+    $result = $action->encode();
+    ksort($result);
+    $this->_io->record($result);
+
+    Varien_Profiler::stop('mageploy::funnel::record_action');
+
+    Mage::dispatchEvent('mageploy_funnel_record_action_after', array('funnel'=>$this, 'action'=>$action));
+
+    return $this;
+}</code></pre>            
+                    
+                    <p>Given a Tracker (the <code>$action</code> parameter), the
+                        <code>record()</code> method calls <code>encode()</code>
+                        upon it and demands the I/O Object to store the result.<br/>
+                        The result is an array and the <code>ksort($result)</code>
+                        ensures that the sort order of its colums will be preserved.</p>
+                    
+                    <p>As you have seen, the tracking logic is extremely simple.
+                        The hardest part, as you can guess, is demanded to the 
+                        <code>encode()</code> and <code>decode()</code> methods
+                        of each Tracker.</p>
+                    
                     <h2>3.2 Adding a Tracker</h2>
 
-                    <p>This section still to be covered.</p>
+                    <p>To add a Tracker, the first step is to register the 
+                        configuration node which will be read by the Funnel Object
+                        during the <code>init()</code> method, as seen before.
+                    </p>
+                    
+                    <p>Regardless of the fact that you are working on Mageploy's
+                        code base or in your own module, the structure of the
+                        configuration node is the same, and is shown below:</p>
+                    
+<pre><code>&lt;config&gt;
+    &lt;default&gt;
+        &lt;mageploy&gt;
+            &lt;actions&gt;
+                &lt;your_tracker_identifier&gt; 
+                    &lt;disabled&gt;0&lt;/disabled&gt;
+                    &lt;class&gt;Vendor_Module_Model_ClassName&lt;/class&gt;
+                &lt;/your_tracker_identifier&gt;
+            &lt;/actions&gt;
+        &lt;/mageploy&gt;
+    &lt;/default&gt;
+&lt;/config&gt;</code></pre>                    
+                    
+                    <p>If you are extending the Mageploy's code base, the 
+                        <code>Vendor_Module_Model_ClassName</code> is recommended to be
+                        <code>PugMoRe_Mageploy_Model_Action_&lt;YourClassName&gt;</code>.
+                    </p>
+                    
+                    <p>The <code>&lt;disabled&gt;</code> tag allows you to disable a the
+                        Tracker by specifying values other than <code>0</code>.</p>
+                    
+                    <p>The <code>&lt;class&gt;</code> tag should containg the fully
+                        qualified name of an existing class extending 
+                        <code>PugMoRe_Mageploy_Model_Action_Abstract</code> base class.</p>
                     
                     <h2>3.3 Developing a Tracker</h2>
 
-                    <p>This section still to be covered.</p>
+                    <p>As mentioned above, your Tracker class should extend the
+                        <code>PugMoRe_Mageploy_Model_Action_Abstract</code> base class.</p>
+                    
+                    <p>The base class already provides an <code>encode()</code> 
+                        method which however doesn't do anything useful. That 
+                        means that, despite you should implement your own method,
+                        PHP interpreter won't complain if you don't.</p>
+                    
+                    <p>On the other hand, the base class also declares an 
+                        <code>abstract function decode(...)</code>, which means
+                        that you are obliged to provide an implementation as far 
+                        as you don't want the PHP interpreter to complain about
+                        a missing method in your class.</p>
+                    
+                    <h3>3.3.1 A sample Tracker</h3>
+                    
+                    <p>Let's show how to implement a StoreView Tracker in order 
+                        to learn the basics of Tracker implementation.<br/>
+                        We will implement it into Mageploy's code base, so here
+                        is our configuration node:</p>
+                    
+<pre><code>&lt;config&gt;
+    &lt;default&gt;
+        &lt;mageploy&gt;
+            &lt;actions&gt;
+                &lt;store_storeview&gt; 
+                    &lt;disabled&gt;0&lt;/disabled&gt;
+                    &lt;class&gt;PugMoRe_Mageploy_Model_Action_Store_StoreView&lt;/class&gt;
+                &lt;/store_storeview&gt;
+            &lt;/actions&gt;
+        &lt;/mageploy&gt;
+    &lt;/default&gt;
+&lt;/config&gt;</code></pre>                    
+
+                    <p>And here is the very first implementation of the Tracker
+                        class:</p>
+                    
+<pre><code>class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Model_Action_Abstract {
+    const VERSION = '1';
+    
+    protected $_code = 'system_store';
+    protected $_blankableParams = array('key', 'form_key');
+
+    protected function _getVersion() {
+        return Mage::helper('pugmore_mageploy')->getVersion(2).'.'.self::VERSION;
+    }
+    
+    public function match() {
+        if (!$this->_request) {
+            return false;
+        }
+
+        if ($this->_request->getModuleName() == 'admin') {
+            if ($this->_request->getControllerName() == 'system_store') {
+                if (in_array($this->_request->getActionName(), array('deleteStorePost'))) {
+                    return true;
+                }
+                if (in_array($this->_request->getActionName(), array('save'))) {
+                    if ($this->_request->getParam('store_type') == 'store') {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+    
+    public function encode() {
+        $result = parent::encode();
+        return $result;
+    }
+
+    public function decode($encodedParameters, $version) {
+        // The !empty() ensures that rows without a version number can be 
+        // executed (not without any risk).
+        if (!empty($version) && $this->_getVersion() != $version) {
+            throw new Exception(sprintf("Can't decode the Action encoded with %s Tracker v %s; current Store View Tracker is v %s ", $this->_code, $version, $this->_getVersion()));
+        }
+
+        $parameters = $this->_decodeParams($encodedParameters);
+        $request = new Mage_Core_Controller_Request_Http();
+        $request->setPost($parameters);
+        $request->setQuery($parameters);
+
+        return $request;
+    }
+    
+}</code></pre>
+                    
+                    <p>The <code>const VERSION = '1';</code> is used to keep
+                    track of internal Tracker version. This number should
+                    change every time you make a change in the encoding  
+                    logic in order to prevent Mageploy to decode actions encoded
+                    with different algorithms, which will likely bring to an error.</p>
+                    
+                    <p>The <code>protected $_code = 'system_store';</code> should 
+                    uniquely identify the Tracker; this string is used in logging and
+                    printing and is usually identical to corresponding action 
+                    name even if this is not mandatory.</p>
+                    
+                    <p>The <code>_getVersion()</code> function can't be generalized 
+                        because it accesses the local <code>VERSION</code> constant 
+                        but it's basically always the same code. We admit this is
+                        not something we like much.</p>
+                    
+                    <p>The <code>match()</code> function should return 
+                        <code>true</code> when current Tracker intercepts an 
+                        action it is interested to track.</p>
+                    
+                    <p>typically we track actions which belongs to the 
+                        <code>Mage_Adminhtml</code> Module, whose name is 
+                        <code>admin</code>; in particular, the Store View Tracker 
+                        should intercept the <code>save</code> and <code>deleteStorePost</code>
+                        action belonging to the <code>system_store</code> Controller.
+                        Note that in case of <code>save</code>, a match should 
+                        occurre if and only if the value of the <code>store_type</code> 
+                        Request parameter equals <code>store</code>. This logic
+                        is implemented in the portion of the <code>match()</code>
+                        method implementation shown below:</p>
+
+<pre><code>if ($this->_request->getModuleName() == 'admin') {
+    if ($this->_request->getControllerName() == 'system_store') {
+        if (in_array($this->_request->getActionName(), array('deleteStorePost'))) {
+            return true;
+        }
+        if (in_array($this->_request->getActionName(), array('save'))) {
+            if ($this->_request->getParam('store_type') == 'store') {
+                return true;
+            }
+        }
+    }
+}
+</code></pre>                  
+                    
+                    <p>At this point our Tracker will intercept and match the 
+                        <code>save</code> action of the 
+                        <code>Mage_Adminhtml_System_StoreController</code> but
+                        it doesn't anything interesting yet.</p>
+                    
+                    <p>If we take a look at the Request parameters submitted upon
+                    saving an existing Store View, we have a structure similar 
+                    to the following:</p>
+                    
+<pre><code>[form_key]	string	"XevyrSTGSeiLZ5hj"	
+[store]	array[7]		
+  [group_id]	string	"1"	
+  [name]	string	"Secondary Store View"	
+  [code]	string	"secondary"	
+  [is_active]	string	"1"	
+  [sort_order]	string	"0"	
+  [is_default]	string	""	
+  [store_id]	string	"3"	
+[store_type]	string	"store"	
+[store_action]	string	"edit"	
+</code></pre>            
+                    <p>In case we save a new Store View the structure is the 
+                        same with a difference: the <code>store_id</code> value
+                        is (reasonably) an empty string.</p>
+                    
+                    <p>So, what our encoding function should do? It should:</p>
+                    
+                    <ul>
+                        <li>eliminate useless parameters that can cause errors while
+                            executing back; in our example it's the <code>form_key</code>;</li>
+                        <li>convert the <code>group_id</code> specific ID into 
+                            its relative UUID. Because Store Groups don't have any
+                            unique code, we have to impose the (reasonable) 
+                            assumption that we won't have different Store Groups
+                            with the same name.</li>
+                        <li>convert the <code>store_id</code> specific ID into 
+                            its relative UUID, if it is present. It's easy, 
+                            because Store Views have a unique code and this will 
+                            represent our UUID.</li>
+                    </ul>
+                    
+                    <p>The decoding function should implement the steps which 
+                        permit to obain the same structure with specific IDs 
+                        starting from the unspecific one generated by the 
+                        encoding process.</p>
+                    
+                    <p>Once we implement the <code>encode</code> and <code>deencode</code>
+                        functions we are almost done; Mageploy will do the rest.</p>
+                    
+                    <p>The result that the <code>encode()</code> method will 
+                        return is an indexed array whise colums are explained 
+                        below:</p>
+                    
+                    <ul>
+                        <li><code>INDEX_ACTION_TIMESTAMP</code> (index: 0): 
+                        it's used to store the timestamp the result was
+                        generated; it's populated by the base abstract class and
+                        you should not need to change it.</li>
+                        
+                        <li><code>INDEX_ACTION_USER</code> (index: 1):
+                        it's used to store the user which accomplished the action;
+                        it's populated by the base abstract class and
+                        you should not need to change it. The value is taken from
+                        Mageploy's configuration and it's strictly recommended that
+                        each user sets his own username.</li>
+                        
+                        <li><code>INDEX_ACTION_DESCR</code> (index: 2):
+                        it's used to store a specific description, so the 
+                        <code>encode()</code> method should specifically populate 
+                        this field. This is the message you will see when issuing 
+                        a <em>status</em> or <em>history</em> command via the 
+                        Command Line tool.</li>
+                        
+                        <li><code>INDEX_EXECUTOR_CLASS</code> (index: 3):
+                        it's used to store the name of the class used to encode
+                        and decode current action. This is likely current Tracker 
+                        class name.</li>
+                        
+                        <li><code>INDEX_CONTROLLER_MODULE</code> (index: 4):
+                         it's used to store the Module name of the Controller
+                         which implements the tracked action. typically it's 
+                         current Controller's Module name but in some 
+                         circumstances it can be different, so specifying it is
+                         upon the <code>encode()</code> method.
+                        </li>
+                        
+                        <li><code>INDEX_CONTROLLER_NAME</code> (index: 5):
+                         it's used to store the Controller name, which is 
+                         typically current Controller name.</li>
+                        
+                        <li><code>INDEX_ACTION_NAME</code> (index: 6):
+                        it's used to store the Action name, which is typically 
+                        current Action name.</li>
+                        
+                        <li><code>INDEX_ACTION_PARAMS</code> (index: 7):
+                        it is used to store the parameters needed by the action
+                        in order to be called again by the Command Line Tool. 
+                        Parameters are serialized and then Base64 encoded in 
+                        order to avoid problems while storing them in files. The
+                        functions to encode and decode parameters are already 
+                        provided by the abstract base class.</li>
+                        
+                        <li><code>INDEX_VERSION</code> (index: 8):
+                        it is used to store a version number used in the 
+                        <code>decode()</code> method to check decoding eligibility.
+                        The version number is obtained concatenating the first two
+                        digits of Mageploy's version number with current Tracker's
+                        version. Infact, when encoding or decoding logic changes
+                        in the base abstract class, the first and/or the second
+                        digits of Mageploy's version number should be changed too, 
+                        in order to prevent deconding of rows encoded with different
+                        logics.</li>
+                    </ul>
+                    
+                    <p>And here is the complete code of the Store View 
+                        Tracker.</p>
+                    
+<pre><code>class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Model_Action_Abstract {
+    const VERSION = '1';
+    
+    protected $_code = 'system_store';
+    protected $_blankableParams = array('key', 'form_key');
+
+    protected function _getVersion() {
+        return Mage::helper('pugmore_mageploy')->getVersion(2).'.'.self::VERSION;
+    }
+    
+    public function match() {
+        if (!$this->_request) {
+            return false;
+        }
+
+        if ($this->_request->getModuleName() == 'admin') {
+            if ($this->_request->getControllerName() == 'system_store') {
+                if (in_array($this->_request->getActionName(), array('deleteStorePost'))) {
+                    return true;
+                }
+                if (in_array($this->_request->getActionName(), array('save'))
+                    && $this->_request->getParam('store_type') == 'store') {
+                        return true;
+                }
+            }
+        }
+
+        return false;
+    }
+    
+    public function encode() {
+        $result = parent::encode();
+
+        if ($this->_request) {
+            $params = $this->_request->getParams();
+        
+            // convert Group ID
+            if (isset($params['store']) && ($groupId = $params['store']['group_id'])) {
+                $group = Mage::getModel('core/store_group')->load($groupId);
+                if ($group->getId()) {
+                    $params['store']['group_id'] = $group->getName();
+                }
+            }
+
+            $new = 'new';
+            $actionName = $this->_request->getActionName();
+            if (isset($params['store'])) {
+                $storeCode = $params['store']['code'];            
+            }
+            
+            // Convert Store ID
+            if (isset($params['store']) && $storeId = $params['store']['store_id']) {
+                $new = 'existing';
+                $params['store']['store_id'] = $storeCode;
+            }
+            
+            // Convert Item ID (for deleteStore action)
+            if ($itemId = $params['item_id']) {
+                $new = 'existing';
+                $store = Mage::getModel('core/store')->load($itemId);
+                if ($store->getId()) {
+                    $storeCode = $params['item_id'] = $store->getCode();
+                    $actionName = 'delete';
+                }
+            }
+            
+            foreach ($this->_blankableParams as $key) {
+                if (isset($params[$key])) {
+                    unset($params[$key]);
+                }
+            }
+            
+            $result[self::INDEX_EXECUTOR_CLASS] = get_class($this);
+            $result[self::INDEX_CONTROLLER_MODULE] = $this->_request->getControllerModule();
+            $result[self::INDEX_CONTROLLER_NAME] = $this->_request->getControllerName();
+            $result[self::INDEX_ACTION_NAME] = $this->_request->getActionName();
+            $result[self::INDEX_ACTION_PARAMS] = $this->_encodeParams($params);
+            $result[self::INDEX_ACTION_DESCR] = sprintf("%s %s Store View '%s'", ucfirst($actionName), $new, $storeCode);
+            $result[self::INDEX_VERSION] = $this->_getVersion();
+        }
+        
+        
+        return $result;
+    }
+
+    public function decode($encodedParameters, $version) {
+        // The !empty() ensures that rows without a version number can be 
+        // executed (not without any risk).
+        if (!empty($version) && $this->_getVersion() != $version) {
+            throw new Exception(sprintf("Can't decode the Action encoded with %s Tracker v %s; current Store View Tracker is v %s ", $this->_code, $version, $this->_getVersion()));
+        }
+
+        $parameters = $this->_decodeParams($encodedParameters);
+        
+        // Convert Group UUID
+        if (isset($parameters['store']) && ($groupUuid = $parameters['store']['group_id'])) {
+            $group = Mage::getModel('core/store_group')->load($groupUuid, 'name');
+            if ($group->getId()) {
+                $parameters['store']['group_id'] = $group->getId();
+            }
+        }
+        
+        // Convert Store UUID
+        if (isset($parameters['store']) && $storeUuid = $parameters['store']['store_id']) {
+            $store = Mage::getModel('core/store')->load($storeUuid, 'code');
+            $parameters['store']['store_id'] = $store->getId();
+        }        
+        
+        // Convert Item UUID (for deleteStore action)
+        if ($itemUuid = $parameters['item_id']) {
+            $store = Mage::getModel('core/store')->load($itemUuid, 'code');
+            if ($store->getId()) {
+                $parameters['item_id'] = $store->getId();
+            }
+        }
+        
+        $request = new Mage_Core_Controller_Request_Http();
+        $request->setPost($parameters);
+        $_SERVER['REQUEST_METHOD'] = 'POST'; // checked by StoreController
+        $request->setQuery($parameters);
+        return $request;
+    }
+    
+}
+</code></pre>                    
                     
                     <h2>3.4 Summary</h2>
                     
-                    <p>This section still to be covered.</p>
+                    <p>Developing a Tracker is not a difficult task as Mageploy 
+                        is developed "the Magento way": adding a Tracker is a 
+                        matter of writing some XML (not so much) and a class
+                        implementing tracking logic.</p>
+                    
+                    <p>The difficult part is studying the Controller action that
+                        we want to track and implement the encoding and decoding
+                        methods. In some circumstances, as the one seen in the 
+                        above example, we will have to impose ourselves some 
+                        constraints such the one of not having two Store Groups 
+                        with the same name among the system.</p>
+                    
+                    <p>We hope that this documentation may have helped you 
+                    understanding Mageploy's internals and that you will be
+                    a happy Mageploy's user and, why not, contributor.</p>
                 </section>
 
                 <footer>
