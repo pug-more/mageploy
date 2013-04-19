@@ -23,7 +23,7 @@ class PugMoRe_Mageploy_Model_Action_Cms_Page extends PugMoRe_Mageploy_Model_Acti
 
         if ($this->_request->getModuleName() == 'admin') {
             if ($this->_request->getControllerName() == 'cms_page') {
-                if (in_array($this->_request->getActionName(), array('save'))) {
+                if (in_array($this->_request->getActionName(), array('save', 'delete'))) {
                     return true;
                 }
             }
@@ -75,7 +75,7 @@ class PugMoRe_Mageploy_Model_Action_Cms_Page extends PugMoRe_Mageploy_Model_Acti
         // The !empty() ensures that rows without a version number can be 
         // executed (not without any risk).
         if (!empty($version) && $this->_getVersion() != $version) {
-            throw new Exception(sprintf("Can't decode the Action encoded with %s Tracker v %s; current Block Tracker is v %s ", $this->_code, $version, $this->_getVersion()));
+            throw new Exception(sprintf("Can't decode the Action encoded with %s Tracker v %s; current CMS Page Tracker is v %s ", $this->_code, $version, $this->_getVersion()));
         }
 
         $parameters = $this->_decodeParams($encodedParameters);

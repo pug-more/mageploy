@@ -23,7 +23,7 @@ class PugMoRe_Mageploy_Model_Action_Cms_Block extends PugMoRe_Mageploy_Model_Act
 
         if ($this->_request->getModuleName() == 'admin') {
             if ($this->_request->getControllerName() == 'cms_block') {
-                if (in_array($this->_request->getActionName(), array('save'))) {
+                if (in_array($this->_request->getActionName(), array('save', 'delete'))) {
                     return true;
                 }
             }

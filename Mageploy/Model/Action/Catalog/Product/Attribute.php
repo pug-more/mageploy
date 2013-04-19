@@ -195,7 +195,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
         // The !empty() ensures that rows without a version number can be 
         // executed (not without any risk).
         if (!empty($version) && $this->_getVersion() != $version) {
-            throw new Exception(sprintf("Can't decode the Action encoded with %s Tracker v %s; current Block Tracker is v %s ", $this->_code, $version, $this->_getVersion()));
+            throw new Exception(sprintf("Can't decode the Action encoded with %s Tracker v %s; current Attribute Tracker is v %s ", $this->_code, $version, $this->_getVersion()));
         }
 
         $parameters = $this->_decodeParams($encodedParameters);
