@@ -44,12 +44,22 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     }
 
     protected function _getControllerClassPath($controllerModule, $controllerName) {
+        $moduleParts = explode('_', $controllerModule);
+        $realModule = implode('_', array_splice($moduleParts, 0, 2));
+        $file = Mage::getModuleDir('controllers', $realModule);
+
+        if (count($moduleParts)) {
+            $file .= DS . implode(DS, $moduleParts);
+        }
+
         $parts = explode('_', uc_words($controllerName));
-        $file = Mage::getModuleDir('controllers', $controllerModule);
+
         if (count($parts)) {
             $file .= DS . implode(DS, $parts);
         }
+
         $file .= 'Controller.php';
+
         return $file;
     }
 
