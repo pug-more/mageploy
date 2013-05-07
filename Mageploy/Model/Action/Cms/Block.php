@@ -96,6 +96,16 @@ class PugMoRe_Mageploy_Model_Action_Cms_Block extends PugMoRe_Mageploy_Model_Act
                     ->addStoreFilter($storeId, false)
                     ->addFieldToFilter('identifier', $identifier)
                     ->getFirstItem();
+
+            /**
+             * On blocks created out of the box by Magento, the addStoreFilter
+             * doesn't seem to return the requested object.
+             */
+            if (!$block->getId()) {
+                $block = Mage::getModel('cms/block')->getCollection()
+                    ->addFieldToFilter('identifier', $identifier)
+                    ->getFirstItem();
+            }
             
             $parameters['block_id'] = $block->getId();
         }

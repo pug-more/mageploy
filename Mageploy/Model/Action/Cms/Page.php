@@ -96,7 +96,17 @@ class PugMoRe_Mageploy_Model_Action_Cms_Page extends PugMoRe_Mageploy_Model_Acti
                     ->addStoreFilter($storeId, false)
                     ->addFieldToFilter('identifier', $identifier)
                     ->getFirstItem();
-                    
+
+            /**
+             * On pages created out of the box by Magento, the addStoreFilter
+             * doesn't seem to return the requested object.
+             */
+            if (!$page->getId()) {
+                $page = Mage::getModel('cms/page')->getCollection()
+                    ->addFieldToFilter('identifier', $identifier)
+                    ->getFirstItem();
+            }
+
             $parameters['page_id'] = $page->getId();
         }
         
