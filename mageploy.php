@@ -222,8 +222,8 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     }
 
     public function usageHelp() {
-        $helper = Mage::helper('pugmore_mageploy');
-        $this->_printHeader($helper->isActive());
+        $doTracking = func_get_arg(0);
+        $this->_printHeader($doTracking);
 
         $help = "Usage:\tphp mageploy.php --[options]\r\n\r\n";
         foreach ($this->_options as $option => $description) {
