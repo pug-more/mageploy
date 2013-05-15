@@ -46,9 +46,13 @@ class PugMoRe_Mageploy_Model_Action_Cms_Block extends PugMoRe_Mageploy_Model_Act
 
             // convert block_id
             $new = 'new';
+            $identifier = $params['identifier'];
             if (isset($params['block_id'])) {
                 $new = 'existing';
-                $params['block_id'] = $params['identifier'] . self::UUID_SEPARATOR 
+                // Read the identifier from existing block; in case of delete,
+                // in fact, the  $params['identifier'] does not contain any value
+                $identifier = Mage::getModel('cms/block')->load($params['block_id'])->getIdentifier();
+                $params['block_id'] = $identifier . self::UUID_SEPARATOR
                         . implode(self::UUID_SEPARATOR, $params['stores']);
             }
             
@@ -63,7 +67,7 @@ class PugMoRe_Mageploy_Model_Action_Cms_Block extends PugMoRe_Mageploy_Model_Act
             $result[self::INDEX_CONTROLLER_NAME] = $this->_request->getControllerName();
             $result[self::INDEX_ACTION_NAME] = $this->_request->getActionName();
             $result[self::INDEX_ACTION_PARAMS] = $this->_encodeParams($params);
-            $result[self::INDEX_ACTION_DESCR] = sprintf("%s %s Static Block '%s'", ucfirst($this->_request->getActionName()), $new, $params['identifier']);
+            $result[self::INDEX_ACTION_DESCR] = sprintf("%s %s Static Block '%s'", ucfirst($this->_request->getActionName()), $new, $identifier);
             $result[self::INDEX_VERSION] = $this->_getVersion();
         } else {
             $result = false;
