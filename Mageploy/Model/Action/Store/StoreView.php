@@ -4,8 +4,9 @@
  *
  * @author Alessandro Ronchi <aronchi at webgriffe.com>
  */
-class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Model_Action_Abstract {
-    const VERSION = '1';
+class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Model_Action_Abstract
+{
+    const VERSION = '1'; // Change this only if encoding/decoding format changes
     
     protected $_code = 'system_store';
     protected $_blankableParams = array('key', 'form_key');
@@ -15,6 +16,7 @@ class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Mod
     }
     
     public function match() {
+
         if (!$this->_request) {
             return false;
         }
@@ -39,37 +41,65 @@ class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Mod
 
         if ($this->_request) {
             $params = $this->_request->getParams();
-        
-            // convert Group ID
-            if (isset($params['store']) && ($groupId = $params['store']['group_id'])) {
-                $group = Mage::getModel('core/store_group')->load($groupId);
-                if ($group->getId()) {
-                    $params['store']['group_id'] = $group->getName();
-                }
+
+            // Init log vars
+            $new = 'new';
+            $storeCode = (isset($params['store']) ? $params['store']['code'] : '<undefined>');
+            $actionName = $this->_request->getActionName();
+
+            switch ($params['store_action']) {
+                //
+                // Handle saving of existing Store View
+                //
+                case 'edit':
+                    // Adapt log vars
+                    $new = 'existing';
+                    $store = Mage::getModel('core/store')->load($params['store']['store_id']);
+                    if ($store->getId()) {
+                        $storeCode = $store->getCode();
+                    }
+
+                    // Convert Original Group ID
+                    $originalGroupId = $params['store']['original_group_id'];
+                    $originalGroup = Mage::getModel('core/store_group')->load($originalGroupId);
+                    if ($originalGroup->getId()) {
+                        $params['store']['original_group_id'] = $originalGroup->getName();
+                    }
+
+                    // Convert Store ID
+                    $params['store']['store_id'] = $params['store']['code'];
+
+                    // break intentionally omitted
+
+                //
+                // Handle adding new Store View
+                //
+                case 'add':
+                    // Covert Group ID
+                    $groupId = $params['store']['group_id'];
+                    $group = Mage::getModel('core/store_group')->load($groupId);
+                    if ($group->getId()) {
+                        $params['store']['group_id'] = $group->getName();
+                    }
+
+                    break;
+
+                //
+                // Handle deleting existing Store View
+                // store_action parameter is undefined in case of delete
+                //
+                default:
+                    // Adapt log vars and Convert Item ID
+                    $new = 'existing';
+                    $actionName = 'delete';
+                    $store = Mage::getModel('core/store')->load($params['item_id']);
+                    if ($store->getId()) {
+                        $storeCode = $params['item_id'] = $store->getCode();
+                    }
+
+                    break;
             }
 
-            $new = 'new';
-            $actionName = $this->_request->getActionName();
-            if (isset($params['store'])) {
-                $storeCode = $params['store']['code'];            
-            }
-            
-            // Convert Store ID
-            if (isset($params['store']) && $storeId = $params['store']['store_id']) {
-                $new = 'existing';
-                $params['store']['store_id'] = $storeCode;
-            }
-            
-            // Convert Item ID (for deleteStore action)
-            if ($itemId = $params['item_id']) {
-                $new = 'existing';
-                $store = Mage::getModel('core/store')->load($itemId);
-                if ($store->getId()) {
-                    $storeCode = $params['item_id'] = $store->getCode();
-                    $actionName = 'delete';
-                }
-            }
-            
             foreach ($this->_blankableParams as $key) {
                 if (isset($params[$key])) {
                     unset($params[$key]);
@@ -85,7 +115,6 @@ class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Mod
             $result[self::INDEX_VERSION] = $this->_getVersion();
         }
         
-        
         return $result;
     }
 
@@ -96,34 +125,60 @@ class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Mod
             throw new Exception(sprintf("Can't decode the Action encoded with %s Tracker v %s; current Store View Tracker is v %s ", $this->_code, $version, $this->_getVersion()));
         }
 
-        $parameters = $this->_decodeParams($encodedParameters);
-        
-        // Convert Group UUID
-        if (isset($parameters['store']) && ($groupUuid = $parameters['store']['group_id'])) {
-            $group = Mage::getModel('core/store_group')->load($groupUuid, 'name');
-            if ($group->getId()) {
-                $parameters['store']['group_id'] = $group->getId();
-            }
+        $params = $this->_decodeParams($encodedParameters);
+
+        switch ($params['store_action']) {
+            //
+            // Handle saving of existing Store View
+            //
+            case 'edit':
+                // Convert Original Group UUID
+                $originalGroupUuid = $params['store']['original_group_id'];
+                $originalGroup = Mage::getModel('core/store_group')->load($originalGroupUuid, 'name');
+                if ($originalGroup->getId()) {
+                    $params['store']['original_group_id'] = $originalGroup->getId();
+                }
+
+                // Convert Store UUID
+                $storeUuid = $params['store']['store_id'];
+                $store = Mage::getModel('core/store')->load($storeUuid, 'code');
+                if ($store->getId()) {
+                    $params['store']['store_id'] = $store->getId();
+                }
+
+                // break intentionally omitted
+
+            //
+            // Handle adding new Store View
+            //
+            case 'add':
+                // Covert Group UUID
+                $groupUuid = $params['store']['group_id'];
+                $group = Mage::getModel('core/store_group')->load($groupUuid, 'name');
+                if ($group->getId()) {
+                    $params['store']['group_id'] = $group->getId();
+                }
+
+                break;
+
+            //
+            // Handle deleting existing Store View
+            // store_action parameter is undefined in case of delete
+            //
+            default:
+                //Convert Item UUID
+                $itemUuid = $params['item_id'];
+                $store = Mage::getModel('core/store')->load($itemUuid, 'code');
+                if ($store->getId()) {
+                    $params['item_id'] = $store->getId();
+                }
+                break;
         }
-        
-        // Convert Store UUID
-        if (isset($parameters['store']) && $storeUuid = $parameters['store']['store_id']) {
-            $store = Mage::getModel('core/store')->load($storeUuid, 'code');
-            $parameters['store']['store_id'] = $store->getId();
-        }        
-        
-        // Convert Item UUID (for deleteStore action)
-        if ($itemUuid = $parameters['item_id']) {
-            $store = Mage::getModel('core/store')->load($itemUuid, 'code');
-            if ($store->getId()) {
-                $parameters['item_id'] = $store->getId();
-            }
-        }
-        
+
         $request = new Mage_Core_Controller_Request_Http();
-        $request->setPost($parameters);
-        $_SERVER['REQUEST_METHOD'] = 'POST'; // checked by StoreController
-        $request->setQuery($parameters);
+        $request->setPost($params);
+        $_SERVER['REQUEST_METHOD'] = 'POST'; // needed by StoreController
+        $request->setQuery($params);
         return $request;
     }
     
