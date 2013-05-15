@@ -44,6 +44,11 @@ abstract class PugMoRe_Mageploy_Model_Action_Abstract {
     }
     
     public function match() {
+        $h = Mage::helper('pugmore_mageploy');
+        $h->log("Module name: %s", $this->_request->getModuleName());
+        $h->log("Controller name: %s", $this->_request->getControllerName());
+        $h->log("Action name: %s", $this->_request->getActionName());
+        $h->log("Request Parameters: %s", print_r($this->_request->getParams(), true));
         return false;
     }
 
