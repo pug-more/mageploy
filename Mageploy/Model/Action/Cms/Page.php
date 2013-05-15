@@ -46,9 +46,13 @@ class PugMoRe_Mageploy_Model_Action_Cms_Page extends PugMoRe_Mageploy_Model_Acti
             
             // convert ID, if page already exists
             $new = 'new';
+            $identifier = $params['identifier'];
             if (isset($params['page_id'])) {
                 $new = 'existing';
-                $params['page_id'] = $params['identifier'] . self::UUID_SEPARATOR 
+                // Read the identifier from existing page; in case of delete,
+                // in fact, the  $params['identifier'] does not contain any value
+                $identifier = Mage::getModel('cms/page')->load($params['page_id'])->getIdentifier();
+                $params['page_id'] = $identifier . self::UUID_SEPARATOR
                         . implode(self::UUID_SEPARATOR, $params['stores']);
             }
 
@@ -63,7 +67,7 @@ class PugMoRe_Mageploy_Model_Action_Cms_Page extends PugMoRe_Mageploy_Model_Acti
             $result[self::INDEX_CONTROLLER_NAME] = $this->_request->getControllerName();
             $result[self::INDEX_ACTION_NAME] = $this->_request->getActionName();
             $result[self::INDEX_ACTION_PARAMS] = $this->_encodeParams($params);
-            $result[self::INDEX_ACTION_DESCR] = sprintf("%s %s CMS Page '%s'", ucfirst($this->_request->getActionName()), $new, $params['identifier']);
+            $result[self::INDEX_ACTION_DESCR] = sprintf("%s %s CMS Page '%s'", ucfirst($this->_request->getActionName()), $new, $identifier);
             $result[self::INDEX_VERSION] = $this->_getVersion();
         } else {
             $result = false;
