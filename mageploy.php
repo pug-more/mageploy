@@ -79,8 +79,6 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     }
 
     public function run() {
-        ob_start(); // enable output buffering to avoid "headers already sent" problem
-        
         $helper = Mage::helper('pugmore_mageploy');
 
         $track = $this->getArgs('t', 'track');
@@ -138,6 +136,8 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                     if (($id > 0) && ($i + 1 != $id)) {
                         continue;
                     }
+
+                    ob_start(); // enable output buffering to avoid "headers already sent" problem
 
                     $actionExecutorClass = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_EXECUTOR_CLASS];
                     $actionExecutorVersion = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_VERSION];
@@ -210,7 +210,9 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                     // problems with already populated objects (i.e. registry)
                     Mage::reset();
                     Mage::init($this->_appCode, $this->_appType);
-                }
+
+                    ob_flush();
+                }// end foreach
                 printf("\r\nExecuted actions: %d/%d\r\n", $executed, count($pendingList));
             } else {
                 printf("There aren't any pending actions to execute.\r\n");
