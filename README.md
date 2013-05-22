@@ -27,6 +27,9 @@ At the moment the following trackers have been developed for (not tested so much
 * Categories
 * CMS Blocks
 * CMS Pages
+* Websites
+* Store Groups
+* Store Views
 
 TO-BE
 -----
@@ -43,7 +46,6 @@ So many more trackers should be developed for:
 * URL Rewrites
 * Promotions
 * Transactional Emails
-* Stores
 * Order Statuses
 
 RELEASE NOTES
