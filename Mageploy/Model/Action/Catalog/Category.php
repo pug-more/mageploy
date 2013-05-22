@@ -26,23 +26,13 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
 //    }
     
     protected function _getCategoryIdFromPath($path) {
-        return substr($path, strrpos($path, '/') + 1);
+        return Mage::helper('pugmore_mageploy')
+            ->getCategoryIdFromPath($path);
     }
 
     protected function _getCategoryUuidFromPath($path, $append = null) {
-        $categoryUuidParts = array();
-        $categoryIdParts = explode('/', $path);
-        foreach ($categoryIdParts as $i => $catId) {
-            if ($i == 0) {
-                $categoryUuidParts[] = Mage_Catalog_Model_Category::TREE_ROOT_ID;
-            } else {
-                $categoryUuidParts[] = Mage::getModel('catalog/category')->load($catId)->getName();
-            }
-        }
-        if ($append) {
-            $categoryUuidParts[] = $append;
-        }
-        return implode(self::UUID_SEPARATOR, $categoryUuidParts);
+        return Mage::helper('pugmore_mageploy')
+            ->getCategoryUuidFromPath($path, $append, self::UUID_SEPARATOR);
     }
 
     /*
@@ -50,26 +40,13 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
      * We are assuming that siblings will never have the same name.
      */
     protected function _getCategoryFromParentIdAndName($parentId, $name) {
-        return Mage::getModel('catalog/category')
-                        ->getCollection()
-                        ->addAttributeToSelect('*')
-                        ->addFieldToFilter('parent_id', $parentId)
-                        ->addFieldToFilter('name', $name)
-                        ->getFirstItem();
+        return Mage::helper('pugmore_mageploy')
+            ->_getCategoryFromParentIdAndName($parentId, $name);
     }
 
     protected function _getCategoryPathFromUuid($uuid) {
-        $pathParts = array();
-        $categoryPathParts = explode(self::UUID_SEPARATOR, $uuid);
-        foreach ($categoryPathParts as $i => $catUuid) {
-            if ($i == 0) {
-                $pathParts[] = Mage_Catalog_Model_Category::TREE_ROOT_ID;
-            } else {
-                $category = $this->_getCategoryFromParentIdAndName($pathParts[$i - 1], $catUuid);
-                $pathParts[] = $category->getId();
-            }
-        }
-        return implode('/', $pathParts);
+        return Mage::helper('pugmore_mageploy')
+            ->getCategoryPathFromUuid($uuid, self::UUID_SEPARATOR);
     }
 
     public function match() {
