@@ -1,14 +1,14 @@
 <?php
 /**
- * Description of StoreView
+ * Description of Website
  *
  * @author Alessandro Ronchi <aronchi at webgriffe.com>
  */
-class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Model_Action_Abstract
+class PugMoRe_Mageploy_Model_Action_Store_Website extends PugMoRe_Mageploy_Model_Action_Abstract
 {
     const VERSION = '1'; // Change this only if encoding/decoding format changes
     
-    protected $_code = 'system_store_storeview';
+    protected $_code = 'system_store_website';
     protected $_blankableParams = array('key', 'form_key');
 
     protected function _getVersion() {
@@ -23,11 +23,11 @@ class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Mod
 
         if ($this->_request->getModuleName() == 'admin') {
             if ($this->_request->getControllerName() == 'system_store') {
-                if (in_array($this->_request->getActionName(), array('deleteStorePost'))) {
+                if (in_array($this->_request->getActionName(), array('deleteWebsitePost'))) {
                     return true;
                 }
                 if (in_array($this->_request->getActionName(), array('save'))
-                    && $this->_request->getParam('store_type') == 'store') {
+                    && $this->_request->getParam('store_type') == 'website') {
                         return true;
                 }
             }
@@ -44,57 +44,52 @@ class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Mod
 
             // Init log vars
             $new = 'new';
-            $storeCode = (isset($params['store']) ? $params['store']['code'] : '<undefined>');
+            $websiteCode = (isset($params['website']) ? $params['website']['code'] : '<undefined>');
             $actionName = $this->_request->getActionName();
 
             switch ($params['store_action']) {
                 //
-                // Handle saving of existing Store View
+                // Handle saving of existing Website
                 //
                 case 'edit':
                     // Adapt log vars
                     $new = 'existing';
-                    $store = Mage::getModel('core/store')->load($params['store']['store_id']);
-                    if ($store->getId()) {
-                        $storeCode = $store->getCode();
+                    $website = Mage::getModel('core/website')->load($params['website']['website_id']);
+                    if ($website->getId()) {
+                        $websiteCode = $website->getCode();
                     }
 
-                    // Convert Original Group ID
-                    $originalGroupId = $params['store']['original_group_id'];
-                    $originalGroup = Mage::getModel('core/store_group')->load($originalGroupId);
-                    if ($originalGroup->getId()) {
-                        $params['store']['original_group_id'] = $originalGroup->getName();
+                    // Convert Default Group ID
+                    $defaultGroupId = $params['website']['default_group_id'];
+                    $defaultGroup = Mage::getModel('core/store_group')->load($defaultGroupId);
+                    if ($defaultGroup->getId()) {
+                        $params['website']['default_group_id'] = $defaultGroup->getName();
                     }
 
-                    // Convert Store ID
-                    $params['store']['store_id'] = $params['store']['code'];
+                    // Convert Website ID
+                    $params['website']['website_id'] = $params['website']['code'];
 
                     // break intentionally omitted
 
                 //
-                // Handle adding new Store View
+                // Handle adding new Website
                 //
                 case 'add':
-                    // Covert Group ID
-                    $groupId = $params['store']['group_id'];
-                    $group = Mage::getModel('core/store_group')->load($groupId);
-                    if ($group->getId()) {
-                        $params['store']['group_id'] = $group->getName();
-                    }
+                    // Nothing to convert
 
                     break;
 
                 //
-                // Handle deleting existing Store View
+                // Handle deleting existing Website
                 // store_action parameter is undefined in case of delete
                 //
                 default:
                     // Adapt log vars and Convert Item ID
                     $new = 'existing';
                     $actionName = 'delete';
-                    $store = Mage::getModel('core/store')->load($params['item_id']);
-                    if ($store->getId()) {
-                        $storeCode = $params['item_id'] = $store->getCode();
+                    $website = Mage::getModel('core/website')->load($params['item_id']);
+                    if ($website->getId()) {
+                        $websiteCode = $params['item_id'] = $website->getCode();
                     }
 
                     break;
@@ -111,7 +106,7 @@ class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Mod
             $result[self::INDEX_CONTROLLER_NAME] = $this->_request->getControllerName();
             $result[self::INDEX_ACTION_NAME] = $this->_request->getActionName();
             $result[self::INDEX_ACTION_PARAMS] = $this->_encodeParams($params);
-            $result[self::INDEX_ACTION_DESCR] = sprintf("%s %s Store View '%s'", ucfirst($actionName), $new, $storeCode);
+            $result[self::INDEX_ACTION_DESCR] = sprintf("%s %s Website '%s'", ucfirst($actionName), $new, $websiteCode);
             $result[self::INDEX_VERSION] = $this->_getVersion();
         }
         
@@ -122,55 +117,50 @@ class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Mod
         // The !empty() ensures that rows without a version number can be 
         // executed (not without any risk).
         if (!empty($version) && $this->_getVersion() != $version) {
-            throw new Exception(sprintf("Can't decode the Action encoded with %s Tracker v %s; current Store View Tracker is v %s ", $this->_code, $version, $this->_getVersion()));
+            throw new Exception(sprintf("Can't decode the Action encoded with %s Tracker v %s; current Website Tracker is v %s ", $this->_code, $version, $this->_getVersion()));
         }
 
         $params = $this->_decodeParams($encodedParameters);
 
         switch ($params['store_action']) {
             //
-            // Handle saving of existing Store View
+            // Handle saving of existing Website
             //
             case 'edit':
-                // Convert Original Group UUID
-                $originalGroupUuid = $params['store']['original_group_id'];
-                $originalGroup = Mage::getModel('core/store_group')->load($originalGroupUuid, 'name');
-                if ($originalGroup->getId()) {
-                    $params['store']['original_group_id'] = $originalGroup->getId();
+                // Convert Default Group UUID
+                $defaultGroupUuid = $params['website']['default_group_id'];
+                $defaultGroup = Mage::getModel('core/store_group')->load($defaultGroupUuid, 'name');
+                if ($defaultGroup->getId()) {
+                    $params['website']['default_group_id'] = $defaultGroup->getId();
                 }
 
-                // Convert Store UUID
-                $storeUuid = $params['store']['store_id'];
-                $store = Mage::getModel('core/store')->load($storeUuid, 'code');
-                if ($store->getId()) {
-                    $params['store']['store_id'] = $store->getId();
+                // Convert Website UUID
+                $websiteUuid = $params['website']['website_id'];
+                $website = Mage::getModel('core/website')->load($websiteUuid, 'code');
+                if ($website->getId()) {
+                    $params['website']['website_id'] = $website->getId();
                 }
 
                 // break intentionally omitted
 
             //
-            // Handle adding new Store View
+            // Handle adding new Website
             //
             case 'add':
-                // Covert Group UUID
-                $groupUuid = $params['store']['group_id'];
-                $group = Mage::getModel('core/store_group')->load($groupUuid, 'name');
-                if ($group->getId()) {
-                    $params['store']['group_id'] = $group->getId();
-                }
+                // Nothing to convert
 
                 break;
 
             //
-            // Handle deleting existing Store View
+            // Handle deleting existing Website
             // store_action parameter is undefined in case of delete
             //
             default:
                 //Convert Item UUID
                 $itemUuid = $params['item_id'];
-                $store = Mage::getModel('core/store')->load($itemUuid, 'code');
-                if ($store->getId()) {
-                    $params['item_id'] = $store->getId();
+                $website = Mage::getModel('core/website')->load($itemUuid, 'code');
+                if ($website->getId()) {
+                    $params['item_id'] = $website->getId();
                 }
                 break;
         }

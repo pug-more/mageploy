@@ -2,7 +2,7 @@
 <config>
     <modules>
         <PugMoRe_Mageploy>
-            <version>1.1.5</version>
+            <version>1.1.6</version>
         </PugMoRe_Mageploy>
     </modules>
     
@@ -62,6 +62,14 @@
                     <disabled>0</disabled>
                     <class>PugMoRe_Mageploy_Model_Action_Cms_Page</class>
                 </cms_page>
+                <store_website>
+                    <disabled>0</disabled>
+                    <class>PugMoRe_Mageploy_Model_Action_Store_Website</class>
+                </store_website>
+                <store_group>
+                    <disabled>0</disabled>
+                    <class>PugMoRe_Mageploy_Model_Action_Store_Group</class>
+                </store_group>
                 <store_storeview>
                     <disabled>0</disabled>
                     <class>PugMoRe_Mageploy_Model_Action_Store_StoreView</class>
