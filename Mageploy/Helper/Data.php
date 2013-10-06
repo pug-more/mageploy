@@ -22,6 +22,9 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract
      */
     private $__user = null;
 
+    /** @var  PugMoRe_Mageploy_Model_Io_File */
+    protected $_io = null;
+
     /**
      * Set the tracking status;
      *
@@ -73,10 +76,9 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract
         Mage::log($formattedMsg, null, 'PugMoRe_Mageploy.log', Mage::getStoreConfigFlag('dev/mageploy/debug'));
     }
 
-
     public function isActive()
     {
-        if ($this->__track === false) {
+        if (is_null($this->__track)) {
             $this->__track = Mage::getStoreConfigFlag('dev/mageploy/active');
         }
         return $this->__track;
@@ -107,6 +109,10 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract
         return $this->__user;
     }
 
+    public function isAnonymousUser() {
+        return !strcmp('anonymous', $this->getUser());
+    }
+
     public function getExecutedActionsFilename()
     {
         return 'mageploy_executed.csv';
@@ -115,6 +121,22 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract
     public function getAllActionsFilename()
     {
         return 'mageploy_all.csv';
+    }
+
+    public function getAllActionsCount()
+    {
+        if (is_null($this->_io)) {
+            $this->_io = new PugMoRe_Mageploy_Model_Io_File();
+        }
+        return count($this->_io->getHistoryList());
+    }
+
+    public function getPendingActionsCount()
+    {
+        if (is_null($this->_io)) {
+            $this->_io = new PugMoRe_Mageploy_Model_Io_File();
+        }
+        return count($this->_io->getPendingList());
     }
 
     public function getAttributeIdFromCode($attributeCode, $entityTypeId)

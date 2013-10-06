@@ -2,11 +2,17 @@
 <config>
     <modules>
         <PugMoRe_Mageploy>
-            <version>1.1.7</version>
+            <version>1.1.8</version>
         </PugMoRe_Mageploy>
     </modules>
     
     <global>
+        <blocks>
+            <pugmore_mageploy>
+                <class>PugMoRe_Mageploy_Block</class>
+            </pugmore_mageploy>
+        </blocks>
+
         <models>
             <pugmore_mageploy>
                 <class>PugMoRe_Mageploy_Model</class>
@@ -31,7 +37,14 @@
                     </mageploy_response>
                 </observers>
             </controller_action_predispatch>
-        </events>        
+        </events>
+        <layout>
+            <updates>
+                <mageploy>
+                    <file>mageploy.xml</file>
+                </mageploy>
+            </updates>
+        </layout>
     </adminhtml>
     
     <default>

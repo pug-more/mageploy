@@ -1,0 +1,26 @@
+<?php
+/** @var PugMoRe_Mageploy_Helper_Data $_helper */
+$_helper = Mage::helper('pugmore_mageploy');
+$_isAnonymous = $this->_isAnonymous();
+$_isActive = $this->_isActive();
+$_pendingActionsCount =  $this->_getPendingActionsCount();
+$_isNotice = ($_isActive && !$_isAnonymous && !$_pendingActionsCount);
+?>
+<div class="notification-global <?php echo $_isNotice ? 'notification-global-notice': '' ?>">
+    <strong><?php echo $this->__('Mageploy v %s', $_helper->getVersion()) ?></strong>:
+
+    <?php if ($_isActive): ?>
+        <span><?php echo $this->__('tracking is active') ?></span>
+    <?php else: ?>
+        <span class="critical"><?php echo $this->__('tracking is not active') ?></span>
+    <?php endif ?>
+
+    <?php if ($_isAnonymous): ?>
+        - <span class="critical"><?php echo $this->__('user is anonymous') ?></span>
+    <?php endif ?>
+
+    - <span><?php echo $this->__('total action(s) tracked: <strong>%d</strong>',  $this->_getAllActionsCount()) ?></span>
+
+    - <span class="<?php echo ($_pendingActionsCount > 0 ? 'critical' : '') ?>"><?php echo $this->__('pending action(s) to execute: <strong>%d</strong>', $_pendingActionsCount) ?></span>
+
+</div>

@@ -12,6 +12,12 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     const TERM_COLOR_GREEN = '32m';
     const TERM_COLOR_YELLOW = '33m';
 
+    /** @var  PugMoRe_Mageploy_Model_Io_File */
+    protected $_io;
+
+    /** @var  PugMoRe_Mageploy_Helper_Data */
+    protected $_helper;
+
     protected $_options = array(
         '--h/help' => 'to show this help',
         '--u/user [val]' => 'set current user name',
@@ -21,6 +27,13 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
         '--r/run [id]' => 'Import changes for specified action (not recommended); leave id blank to import all',
     );
 
+    protected function _construct() {
+        $this->_initSession('admin', 'p4ssw0rd');
+        $this->_helper = Mage::helper('pugmore_mageploy');
+        $this->_io = new PugMoRe_Mageploy_Model_Io_File();
+        return parent::_construct();
+    }
+
     private function __getColoredString($str, $color = null) {
         if (is_null($color))
             return $str;
@@ -29,19 +42,13 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     }
 
     private function __getVersion() {
-        return Mage::helper('pugmore_mageploy')->getVersion();
+        return $this->_helper->getVersion();
     }
 
     protected function _initSession() {
         $userModel = Mage::getModel('admin/user');
         $userModel->setUserId(0);
         Mage::getSingleton('admin/session')->setUser($userModel);
-    }
-
-    protected function _construct() {
-        $this->_io = new PugMoRe_Mageploy_Model_Io_File();
-        $this->_initSession('admin', 'p4ssw0rd');
-        return parent::_construct();
     }
 
     protected function _getControllerClassPath($controllerModule, $controllerName) {
@@ -80,28 +87,26 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     }
 
     public function run() {
-        $helper = Mage::helper('pugmore_mageploy');
-
         // Set tracking
         $track = $this->getArgs('t', 'track');
         if ($track !== false) {
             if (!strcmp('0', $track)) {
-                $doTracking = $helper->disable();
+                $doTracking = $this->_helper->disable();
             } else {
-                $doTracking = $helper->enable();
+                $doTracking = $this->_helper->enable();
             }
         } else {
-            $doTracking = $helper->isActive();
+            $doTracking = $this->_helper->isActive();
         }
 
         // Set username
         $user = $this->getArgs('u', 'user');
         if ($user !== false) {
-            $helper->setUser($user);
+            $this->_helper->setUser($user);
         }
 
         if ($this->getArgs('s', 'status')) {
-            $this->_printHeader($doTracking);
+            $this->_printHeader();
 
             $pendingList = $this->_io->getPendingList();
             if (count($pendingList)) {
@@ -117,7 +122,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                 printf("There aren't any pending actions to execute.\r\n");
             }
         } else if ($limit = $this->getArgs('hi', 'history')) {
-            $this->_printHeader($doTracking);
+            $this->_printHeader();
 
             $historyList = $this->_io->getHistoryList($limit);
             if (count($historyList)) {
@@ -133,7 +138,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                 printf("There aren't any actions tracked.\r\n");
             }
         } else if ($id = $this->getArgs('r', 'run')) {
-            $this->_printHeader($doTracking);
+            $this->_printHeader();
 
             $pendingList = $this->_io->getPendingList();
             if (count($pendingList)) {
@@ -232,8 +237,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     }
 
     public function usageHelp() {
-        $doTracking = func_get_arg(0);
-        $this->_printHeader($doTracking);
+        $this->_printHeader();
 
         $help = "Usage:\tphp mageploy.php --[options]\r\n\r\n";
         foreach ($this->_options as $option => $description) {
@@ -242,11 +246,12 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
         return $help . "\r\n";
     }
 
-    protected function _printHeader($isActive) {
-        $active = $isActive ? $this->__getColoredString("tracking is active", self::TERM_COLOR_GREEN) : $this->__getColoredString("tracking is not active", self::TERM_COLOR_RED);
-        $user = Mage::helper('pugmore_mageploy')->getUser();
-        $user = $this->__getColoredString("user is " . $user, !strcmp('anonymous', $user) ? self::TERM_COLOR_YELLOW : self::TERM_COLOR_GREEN);
-        printf("\r\nMageploy v %s - %s - %s\r\n\r\n", $this->__getVersion(), $active, $user);
+    protected function _printHeader(/*$isActive*/) {
+        $isActive = $this->_helper->isActive() ? $this->__getColoredString("tracking is active", self::TERM_COLOR_GREEN) : $this->__getColoredString("tracking is not active", self::TERM_COLOR_RED);
+        $isAnonymous = $this->_helper->isAnonymousUser();
+        $user = $this->_helper->getUser();
+        $user = $this->__getColoredString("user is " . $user, $isAnonymous ? self::TERM_COLOR_YELLOW : self::TERM_COLOR_GREEN);
+        printf("\r\nMageploy v %s - %s - %s\r\n\r\n", $this->__getVersion(), $isActive, $user);
     }
 
 }

@@ -1,0 +1,10 @@
+<layout>
+    <default>
+        <reference name="notifications">
+            <block
+                    type="pugmore_mageploy/adminhtml_notifications"
+                    name="mageploy_notifications"
+                    template="mageploy/notifications.phtml" />
+        </reference>
+    </default>
+</layout>
