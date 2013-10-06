@@ -14,6 +14,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
 
     protected $_options = array(
         '--h/help' => 'to show this help',
+        '--u/user [val]' => 'set current user name',
         '--t/track [val]' => '0 to disable tracking, any other value or blank to enable it',
         '--hi/history [n]' => 'Show the last n changes. Leave n blank to show all',
         '--s/status' => 'Show if there are any changes to be imported',
@@ -81,6 +82,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     public function run() {
         $helper = Mage::helper('pugmore_mageploy');
 
+        // Set tracking
         $track = $this->getArgs('t', 'track');
         if ($track !== false) {
             if (!strcmp('0', $track)) {
@@ -90,6 +92,12 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
             }
         } else {
             $doTracking = $helper->isActive();
+        }
+
+        // Set username
+        $user = $this->getArgs('u', 'user');
+        if ($user !== false) {
+            $helper->setUser($user);
         }
 
         if ($this->getArgs('s', 'status')) {

@@ -8,11 +8,42 @@
 class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract
 {
 
+    /**
+     * Used to internally store current tracking status
+     *
+     * @var mixed
+     */
+    private $__track = null;
+
+    /**
+     * Used to internally store current username
+     *
+     * @var string
+     */
+    private $__user = null;
+
+    /**
+     * Set the tracking status;
+     *
+     * @param int $value 0 to disable, 1 to enable
+     */
     private function __setActiveFlag($value)
     {
         $config = Mage::getModel('core/config');
         $config->saveConfig('dev/mageploy/active', $value);
-        Mage::app()->cleanCache(array(Mage_Core_Model_Config::CACHE_TAG));
+        $this->__track = $value;
+    }
+
+    /**
+     * Set the current user name
+     *
+     * @param string $username
+     */
+    public function setUser($username)
+    {
+        $config = Mage::getModel('core/config');
+        $config->saveConfig('dev/mageploy/user', $username);
+        $this->__user = $username;
     }
 
     /**
@@ -45,7 +76,10 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function isActive()
     {
-        return Mage::getStoreConfigFlag('dev/mageploy/active');
+        if ($this->__track === false) {
+            $this->__track = Mage::getStoreConfigFlag('dev/mageploy/active');
+        }
+        return $this->__track;
     }
 
     public function disable()
@@ -67,7 +101,10 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function getUser()
     {
-        return Mage::getStoreConfig('dev/mageploy/user');
+        if (is_null($this->__user)) {
+            $this->__user = Mage::getStoreConfig('dev/mageploy/user');
+        }
+        return $this->__user;
     }
 
     public function getExecutedActionsFilename()
