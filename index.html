@@ -241,6 +241,12 @@ Action ID #17 - <span style="color:green">success</span> The page has been saved
 Executed actions: 1/1                    
 </code></pre>      
                     <p>Note that you can also run pending actions one by one specifying the action's ID after the <code>run</code> option. <strong>But pay attention:</strong> doing so you run the risk to break the correct sequence in which actions were executed and this can cause problems. If, for example, you run the action that associates an Attribute to an Attribute Set before the Attribute is created, you can imagine that this will cause some errors. So we advice you not to run actions one by one unless you are really sure of what you are doing. We implemented this function mainly for debugging purposes.</p>
+
+                    <h3>1.4.5 Changing the user's name</h3>
+
+                    <p>In  Mageploy v 1.1.7 we have introduced the ability to set current user's name via command line, as shown below:</p>
+
+<pre><code>$ php shell/mageploy.php -u myusername</code></pre>                    
                     
                     <h2>1.5 Summary</h2>
 
