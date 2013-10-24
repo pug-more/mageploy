@@ -35,7 +35,7 @@ class PugMoRe_Mageploy_Model_Io_File {
         fputcsv($this->_done, $stream);
     }
 
-    public function getHistoryList($limit) {
+    public function getHistoryList($limit = null) {
         $csv = new Varien_File_Csv();
         try {
             $historyList = $csv->getData($this->_helper->getStoragePath().$this->_helper->getAllActionsFilename());
