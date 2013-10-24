@@ -6,7 +6,7 @@ $_isActive = $this->_isActive();
 $_pendingActionsCount =  $this->_getPendingActionsCount();
 $_isNotice = ($_isActive && !$_isAnonymous && !$_pendingActionsCount);
 ?>
-<div class="notification-global <?php echo $_isNotice ? 'notification-global-notice': '' ?>">
+<div class="notification-global <?php echo $_isNotice ? 'notification-global-notice': '' ?>" style="background-color:#CCECFC;">
     <strong><?php echo $this->__('Mageploy v %s', $_helper->getVersion()) ?></strong>:
 
     <?php if ($_isActive): ?>
