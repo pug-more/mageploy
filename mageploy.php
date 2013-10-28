@@ -167,7 +167,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                             $parameters = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_PARAMS];
                             try {
                                 $request = $actionExecutor->decode($parameters, $actionExecutorVersion);
-                                $controller = new $controllerClassName($request, new Mage_Core_Controller_Response_Http());
+                                $controller = new $controllerClassName($request, new PugMoRe_Mageploy_Controller_Response_Http);
                                 $action = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_NAME] . 'Action';
                                 $controller->preDispatch();
                                 $controller->$action();
