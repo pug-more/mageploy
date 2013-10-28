@@ -150,8 +150,6 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                         continue;
                     }
 
-                    ob_start(); // enable output buffering to avoid "headers already sent" problem
-
                     $actionExecutorClass = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_EXECUTOR_CLASS];
                     $actionExecutorVersion = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_VERSION];
                     $controllerModule = $row[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_CONTROLLER_MODULE];
@@ -174,6 +172,8 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                                 $controller->preDispatch();
                                 $controller->$action();
                                 $controller->postDispatch();
+                            } catch (Zend_Controller_Response_Exception $e) {
+                                # do nothing: avoid "Headers already sent" error message
                             } catch (Exception $e) {
                                 $session->addError($e->getMessage());
                             }
@@ -223,8 +223,6 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
                     // problems with already populated objects (i.e. registry)
                     Mage::reset();
                     Mage::init($this->_appCode, $this->_appType);
-
-                    ob_flush();
                 }// end foreach
                 printf("\r\nExecuted actions: %d/%d\r\n", $executed, count($pendingList));
             } else {
