@@ -67,7 +67,7 @@ class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Mod
                     }
 
                     // Convert Store ID
-                    $params['store']['store_id'] = $params['store']['code'];
+                    $params['store']['store_id'] = $storeCode;
 
                     // break intentionally omitted
 
