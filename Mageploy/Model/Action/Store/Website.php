@@ -132,6 +132,8 @@ class PugMoRe_Mageploy_Model_Action_Store_Website extends PugMoRe_Mageploy_Model
                 $defaultGroup = Mage::getModel('core/store_group')->load($defaultGroupUuid, 'name');
                 if ($defaultGroup->getId()) {
                     $params['website']['default_group_id'] = $defaultGroup->getId();
+                } else {
+                    throw new Exception('Group \''.$defaultGroupUuid.'\' not found!');
                 }
 
                 // Convert Website UUID
@@ -139,6 +141,8 @@ class PugMoRe_Mageploy_Model_Action_Store_Website extends PugMoRe_Mageploy_Model
                 $website = Mage::getModel('core/website')->load($websiteUuid, 'code');
                 if ($website->getId()) {
                     $params['website']['website_id'] = $website->getId();
+                } else {
+                    throw new Exception('Website \''.$websiteUuid.'\' not found!');
                 }
 
                 // break intentionally omitted
@@ -161,6 +165,8 @@ class PugMoRe_Mageploy_Model_Action_Store_Website extends PugMoRe_Mageploy_Model
                 $website = Mage::getModel('core/website')->load($itemUuid, 'code');
                 if ($website->getId()) {
                     $params['item_id'] = $website->getId();
+                } else {
+                    throw new Exception('Website \''.$itemUuid.'\' not found!');
                 }
                 break;
         }

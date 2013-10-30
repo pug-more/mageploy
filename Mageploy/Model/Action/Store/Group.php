@@ -143,19 +143,35 @@ class PugMoRe_Mageploy_Model_Action_Store_Group extends PugMoRe_Mageploy_Model_A
             // Handle saving of existing Website
             //
             case 'edit':
-                $website = Mage::getModel('core/website')->load($params['group']['website_id'], 'code');
+                $websiteUuid = $params['group']['website_id'];
+                $website = Mage::getModel('core/website')->load($websiteUuid, 'code');
+
+                if (!$website->getId()) {
+                    throw new Exception('Website \''.$websiteUuid.'\' not found!');
+                }
 
                 // Convert Default Store UUID
                 $defaultStoreUuid = $params['group']['default_store_id'];
                 $defaultStore = Mage::getModel('core/store')->load($defaultStoreUuid, 'code');
+
+                if (!$defaultStore->getId()) {
+                    throw new Exception('Store \''.$defaultStoreUuid.'\' not found!');
+                }
+
                 $params['group']['default_store_id'] = $defaultStore->getId();
 
                 // Convert Group UUID
+                $groupUuid = $params['group']['name'];
                 $group = Mage::getModel('core/store_group')
                     ->getCollection()
                     ->addWebsiteFilter($website->getId())
-                    ->addFieldToFilter('name', $params['group']['name'])
+                    ->addFieldToFilter('name', $groupUuid)
                     ->getFirstItem();
+
+                if (!$group->getId()) {
+                    throw new Exception('Group \''.$groupUuid.'\' not found!');
+                }
+
                 $params['group']['group_id'] = $group->getId();
 
                 // break intentionally omitted
@@ -164,8 +180,13 @@ class PugMoRe_Mageploy_Model_Action_Store_Group extends PugMoRe_Mageploy_Model_A
             // Handle adding new Website
             //
             case 'add':
+                $websiteUuid = $params['group']['website_id'];
                 if (!isset($website)) {
-                    $website = Mage::getModel('core/website')->load($params['group']['website_id'], 'code');
+                    $website = Mage::getModel('core/website')->load($websiteUuid, 'code');
+                }
+
+                if (!$website->getId()) {
+                    throw new Exception('Website \''.$websiteUuid.'\' not found!');
                 }
 
                 // Convert Website UUID
@@ -188,6 +209,9 @@ class PugMoRe_Mageploy_Model_Action_Store_Group extends PugMoRe_Mageploy_Model_A
                 $itemUuid = $params['item_id'];
                 list($websiteCode, $groupName) = explode(self::UUID_SEPARATOR, $itemUuid, 2);
                 $website = Mage::getModel('core/website')->load($websiteCode, 'code');
+                if (!$website->getId()) {
+                    throw new Exception('Website \''.$websiteCode.'\' not found!');
+                }
                 $group = Mage::getModel('core/store_group')
                     ->getCollection()
                     ->addWebsiteFilter($website->getId())

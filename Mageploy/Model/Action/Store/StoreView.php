@@ -137,6 +137,8 @@ class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Mod
                 $originalGroup = Mage::getModel('core/store_group')->load($originalGroupUuid, 'name');
                 if ($originalGroup->getId()) {
                     $params['store']['original_group_id'] = $originalGroup->getId();
+                } else {
+                    throw new Exception('Group \''.$originalGroupUuid.'\' not found!');
                 }
 
                 // Convert Store UUID
@@ -144,6 +146,8 @@ class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Mod
                 $store = Mage::getModel('core/store')->load($storeUuid, 'code');
                 if ($store->getId()) {
                     $params['store']['store_id'] = $store->getId();
+                } else {
+                    throw new Exception('Store \''.$storeUuid.'\' not found!');
                 }
 
                 // break intentionally omitted
@@ -157,6 +161,8 @@ class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Mod
                 $group = Mage::getModel('core/store_group')->load($groupUuid, 'name');
                 if ($group->getId()) {
                     $params['store']['group_id'] = $group->getId();
+                } else {
+                    throw new Exception('Group \''.$groupUuid.'\' not found!');
                 }
 
                 break;
@@ -171,6 +177,8 @@ class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Mod
                 $store = Mage::getModel('core/store')->load($itemUuid, 'code');
                 if ($store->getId()) {
                     $params['item_id'] = $store->getId();
+                } else {
+                    throw new Exception('Store \''.$itemUuid.'\' not found!');
                 }
                 break;
         }
