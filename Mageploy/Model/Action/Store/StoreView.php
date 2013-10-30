@@ -6,7 +6,7 @@
  */
 class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Model_Action_Abstract
 {
-    const VERSION = '1'; // Change this only if encoding/decoding format changes
+    const VERSION = '2'; // Change this only if encoding/decoding format changes
     
     protected $_code = 'system_store_storeview';
     protected $_blankableParams = array('key', 'form_key');

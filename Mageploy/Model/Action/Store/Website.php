@@ -67,7 +67,7 @@ class PugMoRe_Mageploy_Model_Action_Store_Website extends PugMoRe_Mageploy_Model
                     }
 
                     // Convert Website ID
-                    $params['website']['website_id'] = $params['website']['code'];
+                    $params['website']['website_id'] = $websiteCode;
 
                     // break intentionally omitted
 

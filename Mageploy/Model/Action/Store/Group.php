@@ -9,7 +9,7 @@
  */
 class PugMoRe_Mageploy_Model_Action_Store_Group extends PugMoRe_Mageploy_Model_Action_Abstract
 {
-    const VERSION = '1'; // Change this only if encoding/decoding format changes
+    const VERSION = '2'; // Change this only if encoding/decoding format changes
     
     protected $_code = 'system_store_group';
     protected $_blankableParams = array('key', 'form_key');
@@ -77,8 +77,7 @@ class PugMoRe_Mageploy_Model_Action_Store_Group extends PugMoRe_Mageploy_Model_A
                 case 'add':
                     // Convert Group ID
                     $website = Mage::getModel('core/website')->load($params['group']['website_id']);
-                    $params['group_id'] = $website->getCode()
-                        . self::UUID_SEPARATOR . $website->getName();
+                    $params['group']['group_id'] = $groupName;
 
                     // Convert Website ID
                     $params['group']['website_id'] = $website->getCode();
@@ -161,7 +160,7 @@ class PugMoRe_Mageploy_Model_Action_Store_Group extends PugMoRe_Mageploy_Model_A
                 $params['group']['default_store_id'] = $defaultStore->getId();
 
                 // Convert Group UUID
-                $groupUuid = $params['group']['name'];
+                $groupUuid = $params['group']['group_id'];
                 $group = Mage::getModel('core/store_group')
                     ->getCollection()
                     ->addWebsiteFilter($website->getId())
