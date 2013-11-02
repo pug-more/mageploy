@@ -20,9 +20,15 @@ class PugMoRe_Mageploy_Model_Request_Funnel {
     public function getActions() {
         return $this->_actions;
     }
-    
-    public function init($io) {
+
+    /**
+     * @param PugMoRe_Mageploy_Model_Io_RecordingInterface $io
+     * @param Mage_Core_Model_Config $config
+     * @return PugMoRe_Mageploy_Model_Request_Funnel $this
+     */
+    public function init($io, $config) {
         $this->_io = $io;
+        $this->_config = $config;
 
         Mage::dispatchEvent('mageploy_funnel_collect_actions_before', array('funnel'=>$this));
         

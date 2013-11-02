@@ -4,7 +4,7 @@
  *
  * @author Alessandro Ronchi <aronchi at webgriffe.com>
  */
-class PugMoRe_Mageploy_Model_Io_File {
+class PugMoRe_Mageploy_Model_Io_File implements PugMoRe_Mageploy_Model_Io_RecordingInterface {
 
     private $_todo;
     private $_done;

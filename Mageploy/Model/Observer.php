@@ -18,7 +18,9 @@ class PugMoRe_Mageploy_Model_Observer
         }
 
         $request = Mage::app()->getRequest();
-        Mage::getModel('pugmore_mageploy/request_funnel')
+        /** @var PugMoRe_Mageploy_Model_Request_Funnel $funnel */
+        $funnel = Mage::getModel('pugmore_mageploy/request_funnel');
+        $funnel
             ->init(Mage::getSingleton('pugmore_mageploy/io_file'))
             ->dispatch($request);
     }
