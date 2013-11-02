@@ -17,11 +17,19 @@ class PugMoRe_Mageploy_Model_Observer
             return;
         }
 
+        /** @var PugMoRe_Mageploy_Model_Io_RecordingInterface $recorder */
+        $recorder = Mage::getSingleton('pugmore_mageploy/io_file');
+
+        /** @var Mage_Core_Model_Config $config */
+        $config = Mage::getConfig();
+
+        /** @var Mage_Core_Controller_Request_Http $request */
         $request = Mage::app()->getRequest();
+
         /** @var PugMoRe_Mageploy_Model_Request_Funnel $funnel */
         $funnel = Mage::getModel('pugmore_mageploy/request_funnel');
         $funnel
-            ->init(Mage::getSingleton('pugmore_mageploy/io_file'))
+            ->init($recorder, $config)
             ->dispatch($request);
     }
 

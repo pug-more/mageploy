@@ -9,8 +9,12 @@ class PugMoRe_Mageploy_Model_Request_Funnel {
     const XML_ACTIONS_PATH = 'default/mageploy/actions';    
     
     protected $_actions = array();
-    
+
+    /** @var  PugMoRe_Mageploy_Model_Io_RecordingInterface */
     protected $_io;
+
+    /** @var  Mage_Core_Model_Config */
+    protected $_config;
     
     public function addAction($actionCode, $action) {
         $this->_actions[$actionCode] = $action;
@@ -32,7 +36,7 @@ class PugMoRe_Mageploy_Model_Request_Funnel {
 
         Mage::dispatchEvent('mageploy_funnel_collect_actions_before', array('funnel'=>$this));
         
-        $actionsInfo =  Mage::getConfig()->getNode(self::XML_ACTIONS_PATH)->asArray();
+        $actionsInfo =  $this->_config->getNode(self::XML_ACTIONS_PATH)->asArray();
 
         Varien_Profiler::start('mageploy::funnel::collect_actions');
         foreach ($actionsInfo as $actionCode => $actionInfo) {
