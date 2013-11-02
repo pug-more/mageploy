@@ -59,7 +59,6 @@ class PugMoRe_Mageploy_Model_Request_Funnel {
     {
         foreach ($this->getActions() as $action) {
             if ($action->setRequest($request)->match()) {
-                
                 $this->record($action);
             }
         }
