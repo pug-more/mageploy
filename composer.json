@@ -1,0 +1,13 @@
+{
+    "name": "pug-more/mageploy",
+    "license": "OSL",
+    "authors": [
+        {
+            "name": "PHP User Group di Modena e Reggio Emilia",
+            "email": "aleron75@gmail.com"
+        }
+    ],
+    "require": {
+        "magento-hackathon/magento-composer-installer":"*"
+    }
+}
