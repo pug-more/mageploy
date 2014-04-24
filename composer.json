@@ -1,6 +1,7 @@
 {
     "name": "pug-more/mageploy",
-    "license": "OSL",
+    "license": "OSL-3.0",
+    "type": "magento-module",
     "authors": [
         {
             "name": "PHP User Group di Modena e Reggio Emilia",
