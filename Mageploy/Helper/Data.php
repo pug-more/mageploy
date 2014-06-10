@@ -34,6 +34,7 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $config = Mage::getModel('core/config');
         $config->saveConfig('dev/mageploy/active', $value);
+        Mage::app()->cleanCache(array(Mage_Core_Model_Config::CACHE_TAG));
         $this->__track = $value;
     }
 
@@ -46,6 +47,7 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $config = Mage::getModel('core/config');
         $config->saveConfig('dev/mageploy/user', $username);
+        Mage::app()->cleanCache(array(Mage_Core_Model_Config::CACHE_TAG));
         $this->__user = $username;
     }
 
