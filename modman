@@ -1,4 +1,4 @@
-Mageploy                		app/code/community/PugMoRe/Mageploy/
+Mageploy                		app/code/community/PugMoRe/Mageploy
 PugMoRe_Mageploy.xml    		app/etc/modules/PugMoRe_Mageploy.xml
 design/layout/mageploy.xml		app/design/adminhtml/default/default/layout/mageploy.xml
 design/template/notifications.phtml	app/design/adminhtml/default/default/template/mageploy/notifications.phtml
