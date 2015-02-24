@@ -8,7 +8,7 @@
 class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Model_Action_Abstract {
 
     const VERSION = '1';
-    
+
     protected $_code = 'catalog_category';
     protected $_blankableParams = array('key', /*'isAjax',*/ 'isIframe', 'form_key',
         'active_tab_id', 'page', 'limit', 'in_category', 'entity_id', 'name', 'sku', 'price', 'position');
@@ -24,7 +24,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
 //                        ->addPathFilter($path)
 //                        ->getFirstItem();
 //    }
-    
+
     protected function _getCategoryIdFromPath($path) {
         return Mage::helper('pugmore_mageploy')
             ->getCategoryIdFromPath($path);
@@ -54,7 +54,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
             return false;
         }
 
-        if ($this->_request->getModuleName() == 'admin') {
+        if ($this->_request->getModuleName() == (string)Mage::getConfig()->getNode('admin/routers/adminhtml/args/frontName')) {
             if ($this->_request->getControllerName() == 'catalog_category') {
                 if (in_array($this->_request->getActionName(), array('save', 'move', 'delete'))) {
                     return true;
@@ -68,7 +68,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
     /*
      * Pay Attention
      * We are assuming that siblings will never have the same name.
-     * @todo explore the possibility to use urls as UUIDs or other kind of 
+     * @todo explore the possibility to use urls as UUIDs or other kind of
      * unique identifiers.
      */
 
@@ -99,7 +99,12 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
             }
 
             // Store
-            $storeId = $params['store'];
+            if (array_key_exists('store', $params)) {
+                $storeId = $params['store'];
+            } else {
+                $storeId = 0;
+            }
+
             if ($storeId) {
                 $storeUuid = Mage::app()->getStore($storeId)->getCode();
             } else {
@@ -108,7 +113,12 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
             $params['store'] = $storeUuid;
 
             // Parent
-            $parentId = $params['parent'];
+            if (array_key_exists('parent', $params)) {
+                $parentId = $params['parent'];
+            } else {
+                $parentId = 0;
+            }
+            
             if ($parentId) {
                 $parentCategory = Mage::getModel('catalog/category')->load($parentId);
                 $parentUuid = $this->_getCategoryUuidFromPath($parentCategory->getPath());
@@ -141,7 +151,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
                     $params['general']['path'] = $this->_getCategoryUuidFromPath($path);
                 }
             }
-            
+
             // pid, paid, aid (move action)
             $moveIds = array('pid', 'aid', 'paid');
             foreach ($moveIds as $key) {
@@ -152,7 +162,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
                     $params[$key] = $moveNodeUuid;
                 }
             }
-            
+
             foreach ($this->_blankableParams as $key) {
                 if (isset($params[$key])) {
                     unset($params[$key]);
@@ -177,7 +187,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
      */
 
     public function decode($encodedParameters, $version) {
-        // The !empty() ensures that rows without a version number can be 
+        // The !empty() ensures that rows without a version number can be
         // executed (not without any risk).
         if (!empty($version) && $this->_getVersion() != $version) {
             throw new Exception(sprintf("Can't decode the Action encoded with %s Tracker v %s; current Category Tracker is v %s ", $this->_code, $version, $this->_getVersion()));
@@ -188,7 +198,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
         // Id
         if (isset($parameters['id'])) {
             $categoryUuid = $parameters['id'];
-            
+
             $path = $this->_getCategoryPathFromUuid($categoryUuid);
             $categoryId = $this->_getCategoryIdFromPath($path);
             $parameters['id'] = $categoryId;
@@ -200,7 +210,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
             $storeId = Mage::app()->getStore($storeCode)->getId();
             $parameters['store'] = $storeId;
         }
-        
+
         // Parent
         $parentUuid = $parameters['parent'];
         if ($parentUuid) {
@@ -208,7 +218,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
             $parentId = $this->_getCategoryIdFromPath($parentPath);
             $parameters['parent'] = $parentId;
         }
-         
+
         // Associated Products
         $associatedProductUuids = explode('&', $parameters['category_products']);
         $associatedProductIds = array();
@@ -233,7 +243,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
                 $parameters['general']['path'] = $this->_getCategoryIdFromPath($parentPath);
             }
         }
-        
+
         // pid, paid, aid (move action)
         $moveIds = array('pid', 'aid', 'paid');
         foreach ($moveIds as $key) {
