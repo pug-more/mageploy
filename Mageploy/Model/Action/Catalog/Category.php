@@ -99,7 +99,12 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
             }
 
             // Store
-            $storeId = $params['store'];
+            if (array_key_exists('store', $params)) {
+                $storeId = $params['store'];
+            } else {
+                $storeId = 0;
+            }
+
             if ($storeId) {
                 $storeUuid = Mage::app()->getStore($storeId)->getCode();
             } else {
@@ -108,7 +113,12 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
             $params['store'] = $storeUuid;
 
             // Parent
-            $parentId = $params['parent'];
+            if (array_key_exists('parent', $params)) {
+                $parentId = $params['parent'];
+            } else {
+                $parentId = 0;
+            }
+            
             if ($parentId) {
                 $parentCategory = Mage::getModel('catalog/category')->load($parentId);
                 $parentUuid = $this->_getCategoryUuidFromPath($parentCategory->getPath());
