@@ -31,7 +31,7 @@ abstract class PugMoRe_Mageploy_Model_Action_Abstract {
     }
     
     protected function _decodeParams($params) {
-        return json_decode($params);
+        return json_decode($params, true);
     }
     
     public function toString() {
