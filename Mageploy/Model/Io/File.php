@@ -28,7 +28,7 @@ class PugMoRe_Mageploy_Model_Io_File implements PugMoRe_Mageploy_Model_Io_Record
 
     public function record($stream) {
         fputcsv($this->_todo, $stream);
-        fputcsv($this->_done, $stream);
+        $this->done($stream);
     }
 
     public function done($stream) {
