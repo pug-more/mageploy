@@ -54,7 +54,8 @@ abstract class PugMoRe_Mageploy_Model_Action_Abstract {
 
     public function encode() {
         $result = array(
-            self::INDEX_ACTION_TIMESTAMP => time(),
+            // we use the micro time this as unique key. it is very unlikely that two persons do an action at the very same time
+            self::INDEX_ACTION_TIMESTAMP => microtime(true),
             self::INDEX_ACTION_USER => Mage::helper('pugmore_mageploy')->getUser(),
         );
         return $result;
