@@ -128,7 +128,7 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract
     public function getAllActionsCount()
     {
         if (is_null($this->_io)) {
-            $this->_io = new PugMoRe_Mageploy_Model_Io_File();
+            $this->_io = new PugMoRe_Mageploy_Model_Io_Hybrid();
         }
         return count($this->_io->getHistoryList());
     }
@@ -136,7 +136,7 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract
     public function getPendingActionsCount()
     {
         if (is_null($this->_io)) {
-            $this->_io = new PugMoRe_Mageploy_Model_Io_File();
+            $this->_io = new PugMoRe_Mageploy_Model_Io_Hybrid();
         }
         return count($this->_io->getPendingList());
     }

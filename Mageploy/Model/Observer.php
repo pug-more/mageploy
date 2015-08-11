@@ -18,7 +18,7 @@ class PugMoRe_Mageploy_Model_Observer
         }
 
         /** @var PugMoRe_Mageploy_Model_Io_RecordingInterface $recorder */
-        $recorder = Mage::getSingleton('pugmore_mageploy/io_file');
+        $recorder = Mage::getSingleton('pugmore_mageploy/io_hybrid');
 
         /** @var Mage_Core_Model_Config $config */
         $config = Mage::getConfig();

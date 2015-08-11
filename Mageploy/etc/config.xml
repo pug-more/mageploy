@@ -2,7 +2,7 @@
 <config>
     <modules>
         <PugMoRe_Mageploy>
-            <version>1.1.11</version>
+            <version>2.0.0</version>
         </PugMoRe_Mageploy>
     </modules>
     
@@ -16,7 +16,16 @@
         <models>
             <pugmore_mageploy>
                 <class>PugMoRe_Mageploy_Model</class>
+                <resourceModel>pugmore_mageploy_resource</resourceModel>
             </pugmore_mageploy>
+            <pugmore_mageploy_resource>
+                <class>PugMoRe_Mageploy_Model_Resource</class>
+                <entities>
+                    <mageploy_executed>
+                        <table>mageploy_executed</table>
+                    </mageploy_executed>
+                </entities>
+            </pugmore_mageploy_resource>
         </models>
 
         <helpers>
@@ -24,8 +33,16 @@
                 <class>PugMoRe_Mageploy_Helper</class>
             </pugmore_mageploy>
         </helpers>
+
+        <resources>
+            <pugmore_mageploy_setup>
+                <setup>
+                    <module>PugMoRe_Mageploy</module>
+                </setup>
+            </pugmore_mageploy_setup>
+        </resources>
     </global>
-    
+
     <adminhtml>
         <events>
             <controller_action_predispatch>
