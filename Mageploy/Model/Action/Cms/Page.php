@@ -37,7 +37,10 @@ class PugMoRe_Mageploy_Model_Action_Cms_Page extends PugMoRe_Mageploy_Model_Acti
         
         if ($this->_request) {
             $params = $this->_request->getParams();
-            
+
+            if (!isset($params['stores'])) {
+                $params['stores'] = array($params['store']);
+            }
             // convert store IDs
             foreach ($params['stores'] as $i => $storeId) {
                 $storeUuid = Mage::app()->getStore($storeId)->getCode();

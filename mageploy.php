@@ -2,8 +2,10 @@
 
 if (file_exists('abstract.php')) {
     require_once 'abstract.php';
-} else {
+} else if (file_exists('shell/abstract.php')) {
     require_once 'shell/abstract.php';
+} else {
+    require_once 'public/shell/abstract.php';
 }
 
 class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
@@ -30,7 +32,7 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     protected function _construct() {
         $this->_initSession('admin', 'p4ssw0rd');
         $this->_helper = Mage::helper('pugmore_mageploy');
-        $this->_io = new PugMoRe_Mageploy_Model_Io_File();
+        $this->_io = new PugMoRe_Mageploy_Model_Io_Hybrid();
         return parent::_construct();
     }
 
