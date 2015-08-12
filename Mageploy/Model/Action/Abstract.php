@@ -5,15 +5,16 @@
  * @author AlessaPugMoRe_Mageploy_Model_Action_Abstractndro Ronchi <aronchi at webgriffe.com>
  */
 abstract class PugMoRe_Mageploy_Model_Action_Abstract {
-    const INDEX_ACTION_TIMESTAMP    = 0;
-    const INDEX_ACTION_USER         = 1;
-    const INDEX_ACTION_DESCR        = 2;
-    const INDEX_EXECUTOR_CLASS      = 3;
-    const INDEX_CONTROLLER_MODULE   = 4;
-    const INDEX_CONTROLLER_NAME     = 5;
-    const INDEX_ACTION_NAME         = 6;
-    const INDEX_ACTION_PARAMS       = 7;
-    const INDEX_VERSION             = 8;
+    const INDEX_ACTION_TIMESTAMP    = 'timestamp';
+    const INDEX_ACTION_UUID         = 'uuid';
+    const INDEX_ACTION_USER         = 'user';
+    const INDEX_ACTION_DESCR        = 'description';
+    const INDEX_EXECUTOR_CLASS      = 'executor_class';
+    const INDEX_CONTROLLER_MODULE   = 'controller_module';
+    const INDEX_CONTROLLER_NAME     = 'controller_name';
+    const INDEX_ACTION_NAME         = 'action_name';
+    const INDEX_ACTION_PARAMS       = 'action_params';
+    const INDEX_VERSION             = 'version';
     
     const UUID_SEPARATOR = '~';
     
@@ -53,9 +54,13 @@ abstract class PugMoRe_Mageploy_Model_Action_Abstract {
     }
 
     public function encode() {
+        // Insert Black Swan reference here
+        $uuid = sha1(uniqid(Mage::helper('pugmore_mageploy')->getUser(), true));
+
         $result = array(
             // we use the micro time this as unique key. it is very unlikely that two persons do an action at the very same time
-            self::INDEX_ACTION_TIMESTAMP => microtime(true),
+            self::INDEX_ACTION_UUID => $uuid,
+            self::INDEX_ACTION_TIMESTAMP => Mage::getSingleton('core/date')->gmtDate('Y-m-d_H_i_s'),
             self::INDEX_ACTION_USER => Mage::helper('pugmore_mageploy')->getUser(),
         );
         return $result;
