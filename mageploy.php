@@ -2,8 +2,10 @@
 
 if (file_exists('abstract.php')) {
     require_once 'abstract.php';
-} else {
+} else if (file_exists('shell/abstract.php')) {
     require_once 'shell/abstract.php';
+} else {
+    require_once 'public/shell/abstract.php';
 }
 
 class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
