@@ -28,11 +28,6 @@ class PugMoRe_Mageploy_Model_Io_Hybrid implements PugMoRe_Mageploy_Model_Io_Reco
         $this->done($stream);
     }
 
-    public function getHash($stream)
-    {
-        return sha1(serialize($stream));
-    }
-
     public function done($stream) {
         $executed = new PugMoRe_Mageploy_Model_Executed();
         $executed->setExecuted($stream[PugMoRe_Mageploy_Model_Action_Abstract::INDEX_ACTION_UUID]);

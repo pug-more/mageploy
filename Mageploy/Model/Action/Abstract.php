@@ -28,11 +28,11 @@ abstract class PugMoRe_Mageploy_Model_Action_Abstract {
     protected abstract function _getVersion();
     
     protected function _encodeParams($params) {
-        return json_encode($params);
+        return $params;
     }
     
     protected function _decodeParams($params) {
-        return json_decode($params, true);
+        return $params;
     }
     
     public function toString() {
