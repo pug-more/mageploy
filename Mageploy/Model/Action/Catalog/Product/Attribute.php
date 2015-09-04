@@ -77,6 +77,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
         if ($this->_request) {
             $params = $this->_request->getParams();
 
+            $attributeId = 0;
             if (isset($params['attribute_code'])) {
                 // new entity
                 // in case of options the only action we have to take is that of
