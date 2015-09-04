@@ -162,11 +162,13 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
 
             // Convert Frontend Label's Store Ids
             $newFrontendLabel = array();
-            foreach ($params['frontend_label'] as $storeId => $value) {
-                $code = Mage::getModel('core/store')->load($storeId)->getCode();
-                $newFrontendLabel[$code] = $value;
+            if (isset($params['frontend_label'])) {
+                foreach ($params['frontend_label'] as $storeId => $value) {
+                    $code = Mage::getModel('core/store')->load($storeId)->getCode();
+                    $newFrontendLabel[$code] = $value;
+                }
+                $params['frontend_label'] = $newFrontendLabel;
             }
-            $params['frontend_label'] = $newFrontendLabel;
 
 
             foreach ($this->_blankableParams as $key) {
