@@ -100,11 +100,12 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
             }
 
 
-            $newOption = $params['option'];
-
             // Attribute Options
             if (isset($params['option'])) {
+
+                $newOption = $params['option'];
                 $option = $params['option'];
+
                 foreach ($option['value'] as $optionId => $optionValues) {
                     foreach ($optionValues as $storeId => $value) {
                         if (!$storeId) {
