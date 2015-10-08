@@ -21,7 +21,7 @@ class PugMoRe_Mageploy_Model_Action_Cms_Page extends PugMoRe_Mageploy_Model_Acti
             return false;
         }
 
-        if ($this->_request->getModuleName() == 'admin') {
+        if ($this->_request->getModuleName() == (string)Mage::getConfig()->getNode('admin/routers/adminhtml/args/frontName')) {
             if ($this->_request->getControllerName() == 'cms_page') {
                 if (in_array($this->_request->getActionName(), array('save', 'delete'))) {
                     return true;

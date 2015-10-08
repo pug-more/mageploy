@@ -21,7 +21,7 @@ class PugMoRe_Mageploy_Model_Action_Store_Website extends PugMoRe_Mageploy_Model
             return false;
         }
 
-        if ($this->_request->getModuleName() == 'admin') {
+        if ($this->_request->getModuleName() == (string)Mage::getConfig()->getNode('admin/routers/adminhtml/args/frontName')) {
             if ($this->_request->getControllerName() == 'system_store') {
                 if (in_array($this->_request->getActionName(), array('deleteWebsitePost'))) {
                     return true;

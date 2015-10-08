@@ -21,7 +21,7 @@ class PugMoRe_Mageploy_Model_Action_System_Config extends PugMoRe_Mageploy_Model
             return false;
         }
 
-        if ($this->_request->getModuleName() == 'admin') {
+        if ($this->_request->getModuleName() == (string)Mage::getConfig()->getNode('admin/routers/adminhtml/args/frontName')) {
             if ($this->_request->getControllerName() == 'system_config') {
                 if (in_array($this->_request->getActionName(), array('save'))) {
                     return true;

@@ -60,7 +60,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
             return false;
         }
 
-        if ($this->_request->getModuleName() == 'admin') {
+        if ($this->_request->getModuleName() == (string)Mage::getConfig()->getNode('admin/routers/adminhtml/args/frontName')) {
             if ($this->_request->getControllerName() == 'catalog_product_attribute') {
                 if (in_array($this->_request->getActionName(), array(/* 'validate', */'save', 'delete'))) {
                     return true;
