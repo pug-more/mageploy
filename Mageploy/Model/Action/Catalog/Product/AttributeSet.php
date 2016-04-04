@@ -70,7 +70,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
             }
 
             // json decode $params['data']
-            $data = Mage::helper('core')->jsonDecode($params['data']);
+            $data = !empty($params['data']) ? Mage::helper('core')->jsonDecode($params['data']) : array();
             if (isset($data['form_key'])) {
                 unset($data['form_key']);
             }
