@@ -13,7 +13,7 @@
                     <fields>
                         <active translate="label,comment">
                             <label>Active</label>
-                            <comment>Choose whether to track actions performed in Admin Control Panel</comment>
+                            <comment><![CDATA[Choose whether to track actions performed in Admin Control Panel]]></comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>10</sort_order>
@@ -23,7 +23,7 @@
                         </active>
                         <debug translate="label,comment">
                             <label>Debug mode</label>
-                            <comment>Force this module to write log files.</comment>
+                            <comment><![CDATA[Force this module to write log files.]]></comment>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>20</sort_order>
@@ -33,13 +33,22 @@
                         </debug>
                         <user translate="label,comment">
                             <label>Specific User Identifier</label>
-                            <comment>This value can be used to identify which user performed each action.</comment>
+                            <comment><![CDATA[This value can be used to identify which user performed each action.]]></comment>
                             <frontend_type>text</frontend_type>
                             <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </user>
+                        <storage translate="label,comment">
+                            <label>Storage directory</label>
+                            <comment><![CDATA[The path where Mageploy will create csv files. Paths starting without a slash '/' are considered relative to Magento root path.]]></comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </storage>
                     </fields>
                 </mageploy>
             </groups>

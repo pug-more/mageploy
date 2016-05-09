@@ -7,6 +7,11 @@
  */
 class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract
 {
+    const XML_PATH_ACTIVE = 'dev/mageploy/active';
+    const XML_PATH_DEBUG = 'dev/mageploy/debug';
+    const XML_PATH_USER = 'dev/mageploy/user';
+    const XML_PATH_STORAGE = 'dev/mageploy/storage';
+
 
     /**
      * Used to internally store current tracking status
@@ -33,7 +38,7 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract
     private function __setActiveFlag($value)
     {
         $config = Mage::getModel('core/config');
-        $config->saveConfig('dev/mageploy/active', $value);
+        $config->saveConfig(self::XML_PATH_ACTIVE, $value);
         Mage::app()->cleanCache(array(Mage_Core_Model_Config::CACHE_TAG));
         $this->__track = $value;
     }
@@ -46,7 +51,7 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract
     public function setUser($username)
     {
         $config = Mage::getModel('core/config');
-        $config->saveConfig('dev/mageploy/user', $username);
+        $config->saveConfig(self::XML_PATH_USER, $username);
         Mage::app()->cleanCache(array(Mage_Core_Model_Config::CACHE_TAG));
         $this->__user = $username;
     }
@@ -75,13 +80,13 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $args = func_get_args();
         $formattedMsg = call_user_func_array('sprintf', $args);
-        Mage::log($formattedMsg, null, 'PugMoRe_Mageploy.log', Mage::getStoreConfigFlag('dev/mageploy/debug'));
+        Mage::log($formattedMsg, null, 'PugMoRe_Mageploy.log', Mage::getStoreConfigFlag(self::XML_PATH_DEBUG));
     }
 
     public function isActive()
     {
         if (is_null($this->__track)) {
-            $this->__track = Mage::getStoreConfigFlag('dev/mageploy/active');
+            $this->__track = Mage::getStoreConfigFlag(self::XML_PATH_ACTIVE);
         }
         return $this->__track;
     }
@@ -100,13 +105,19 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract
 
     public function getStoragePath()
     {
-        return Mage::getBaseDir() . DS . 'var' . DS . 'mageploy' . DS;
+        $path = Mage::getStoreConfig(self::XML_PATH_STORAGE);
+        $suffix = $path[strlen($path) - 1] == DS ? '' : DS;
+        if ($path[0] == DS) {
+            return $path . $suffix;
+        }
+
+        return Mage::getBaseDir() . DS . $path . $suffix;
     }
 
     public function getUser()
     {
         if (is_null($this->__user)) {
-            $this->__user = Mage::getStoreConfig('dev/mageploy/user');
+            $this->__user = Mage::getStoreConfig(self::XML_PATH_USER);
         }
         return $this->__user;
     }

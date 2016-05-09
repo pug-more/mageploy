@@ -4,12 +4,18 @@ How does it work?
 -----------------
 Basically it's a tracker of invocations of Magento Controller Actions. It's based on the recording of actions in two files:
 
-* var/mageploy/mageploy_all.csv
-* var/mageploy/mageploy_executed.csv
+* `{{configured_folder}}/mageploy_all.csv`
+* `{{configured_folder}}/mageploy_executed.csv`
 
 The **mageploy_all.csv** file is **global** and should be put **under version control**. This file keeps track of each action invoked, storing parameters converted and serialized.
 
 The **mageploy_executed.csv** is **local** and should **not be put under version control**. This file keeps track of actions invoked locally and is used to avoid invocations of already invoked actions.
+
+The `{{configured_folder}}` placeholder can be either a relative or an absolute path; in case you use a relative path, 
+the Magento root folder will be used as base path.
+
+**Warning:** don't change the `{{configured_folder}}` after you have already started recording actions if you don't want to
+ loose previous tracked actions.
 
 Once you install mageploy and activate tracking (active by default), Mageploy's Trackers will store action invocations.
 
@@ -56,6 +62,7 @@ A change in the third version number part indicates minor changes or fixes.
 
 A change in the second version number part indicates changes in CSV format which implies that previous encoded CSVs could not be decoded any more.
 
+* 1.2.0 - add possibility to configure the folder where CSV files are created.
 * 1.1.3 - replaced deprecated join and split functions with equivalent implode and explode.
 * 1.1.2 - fix on displaying of error messages while executing actions.
 * 1.1.1 - fix on decode() declaration in Abstract class.
