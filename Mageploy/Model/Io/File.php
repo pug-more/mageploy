@@ -13,25 +13,39 @@ class PugMoRe_Mageploy_Model_Io_File implements PugMoRe_Mageploy_Model_Io_Record
     public function __construct()
     {
         $this->_helper = Mage::helper('pugmore_mageploy');
-        
+
         if (!is_dir($this->_helper->getStoragePath())) {
-            mkdir($this->_helper->getStoragePath(), 0755, true)
-                or die(sprintf("Can't create folder '%s'", $this->_helper->getStoragePath()));
+            $created = mkdir($this->_helper->getStoragePath(), 0755, true);
+            if (false === $created) {
+                Mage::logException(new Exception(sprintf("Can't create folder '%s'", $this->_helper->getStoragePath())));
+            }
         }
 
-        $this->_todo = fopen($this->_helper->getStoragePath().$this->_helper->getAllActionsFilename(), 'a')
-            or die(sprintf("Can't open file '%s'", $this->_helper->getAllActionsFilename()));
-        
-        $this->_done = fopen($this->_helper->getStoragePath().$this->_helper->getExecutedActionsFilename(), 'a')
-            or die(sprintf("Can't open file '%s'", $this->_helper->getExecutedActionsFilename()));
+        $this->_todo = @fopen($this->_helper->getStoragePath().$this->_helper->getAllActionsFilename(), 'a');
+        if (false === $this->_todo) {
+            Mage::logException(new Exception(sprintf("Can't open file '%s'", $this->_helper->getAllActionsFilename())));
+        }
+
+        $this->_done = @fopen($this->_helper->getStoragePath().$this->_helper->getExecutedActionsFilename(), 'a');
+        if (false === $this->_done) {
+            Mage::logException(new Exception(sprintf("Can't open file '%s'", $this->_helper->getExecutedActionsFilename())));
+        }
     }
 
     public function record($stream) {
+        if ((false !== $this->_todo) || (false === $this->_done) ) {
+            return;
+        }
+
         fputcsv($this->_todo, $stream);
         fputcsv($this->_done, $stream);
     }
 
     public function done($stream) {
+        if (false === $this->_done) {
+            return;
+        }
+
         fputcsv($this->_done, $stream);
     }
 
