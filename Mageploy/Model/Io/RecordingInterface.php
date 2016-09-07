@@ -31,4 +31,11 @@ interface PugMoRe_Mageploy_Model_Io_RecordingInterface {
      * @return array
      */
     public function getPendingList();
+
+    /**
+     * Check if there are write issues 
+     * 
+     * @return boolean
+     */
+    public function canRecord();
 }

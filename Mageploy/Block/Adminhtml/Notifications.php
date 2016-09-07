@@ -33,4 +33,8 @@ class PugMoRe_Mageploy_Block_Adminhtml_Notifications extends Mage_Adminhtml_Bloc
         return $this->_helper->getPendingActionsCount();
     }
 
+    protected function _canRecord() {
+        return Mage::getSingleton('pugmore_mageploy/io_file')->canRecord();
+    }
+
 }

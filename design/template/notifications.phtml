@@ -5,9 +5,14 @@ $_isAnonymous = $this->_isAnonymous();
 $_isActive = $this->_isActive();
 $_pendingActionsCount =  $this->_getPendingActionsCount();
 $_isNotice = ($_isActive && !$_isAnonymous && !$_pendingActionsCount);
+$_canRecord = $this->_canRecord();
 ?>
 <div class="notification-global <?php echo $_isNotice ? 'notification-global-notice': '' ?>" style="background-color:#CCECFC;">
     <strong><?php echo $this->__('Mageploy v %s', $_helper->getVersion()) ?></strong>:
+
+    <?php if (! $_canRecord): ?>
+        <span class="critical"><strong><?php echo $this->__('** CRITICAL: ACTION FILES NOT WRITABLE **') ?></strong></span>
+    <?php endif ?>
 
     <?php if ($_isActive): ?>
         <span><?php echo $this->__('tracking is active') ?></span>

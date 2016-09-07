@@ -62,6 +62,8 @@ A change in the third version number part indicates minor changes or fixes.
 
 A change in the second version number part indicates changes in CSV format which implies that previous encoded CSVs could not be decoded any more.
 
+* 1.2.2 - fix previous version; add check for writable files and related warning in header banner
+* 1.2.1 - DON'T USE THIS VERSION - action recording is broken
 * 1.2.0 - add possibility to configure the folder where CSV files are created.
 * 1.1.3 - replaced deprecated join and split functions with equivalent implode and explode.
 * 1.1.2 - fix on displaying of error messages while executing actions.
