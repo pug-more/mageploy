@@ -11,6 +11,7 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_DEBUG = 'dev/mageploy/debug';
     const XML_PATH_USER = 'dev/mageploy/user';
     const XML_PATH_STORAGE = 'dev/mageploy/storage';
+    const XML_PATH_USE_DB = 'dev/mageploy/use_db';
 
 
     /**
@@ -122,6 +123,10 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract
         return $this->__user;
     }
 
+    public function useDb(){
+        return Mage::getStoreConfigFlag(self::XML_PATH_USE_DB);
+    }
+
     public function isAnonymousUser() {
         return !strcmp('anonymous', $this->getUser());
     }
@@ -134,6 +139,17 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract
     public function getAllActionsFilename()
     {
         return 'mageploy_all.csv';
+    }
+
+
+    public function getExecutedActionsTable()
+    {
+        return 'mageploy_executed';
+    }
+
+    public function getAllActionsTable()
+    {
+        return 'mageploy_all';
     }
 
     public function getAllActionsCount()

@@ -7,6 +7,13 @@
     </modules>
     
     <global>
+        <resources>
+            <pugmore_mageploy_setup>
+                <setup>
+                    <module>PugMoRe_Mageploy</module>
+                </setup>
+            </pugmore_mageploy_setup>
+        </resources>
         <blocks>
             <pugmore_mageploy>
                 <class>PugMoRe_Mageploy_Block</class>
@@ -16,7 +23,19 @@
         <models>
             <pugmore_mageploy>
                 <class>PugMoRe_Mageploy_Model</class>
+                <resourceModel>pugmore_mageploy_resource</resourceModel>
             </pugmore_mageploy>
+            <pugmore_mageploy_resource>
+                <class>Pugmore_Mageploy_Model_Resource</class>
+                <entities>
+                    <mageploy_executed>
+                        <table>mageploy_executed</table>
+                    </mageploy_executed>
+                    <mageploy_all>
+                        <table>mageploy_all</table>
+                    </mageploy_all>
+                 </entities>
+            </pugmore_mageploy_resource>
         </models>
 
         <helpers>
@@ -97,6 +116,7 @@
                 <debug>1</debug>
                 <user>anonymous</user>
                 <storage><![CDATA[var/mageploy]]></storage>
+                <use_db>0</use_db>
             </mageploy>
         </dev>
     </default>
