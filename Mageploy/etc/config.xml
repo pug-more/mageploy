@@ -31,9 +31,6 @@
                     <mageploy_executed>
                         <table>mageploy_executed</table>
                     </mageploy_executed>
-                    <mageploy_all>
-                        <table>mageploy_all</table>
-                    </mageploy_all>
                  </entities>
             </pugmore_mageploy_resource>
         </models>
