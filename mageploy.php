@@ -30,7 +30,11 @@ class Mage_Shell_Mageploy extends Mage_Shell_Abstract {
     protected function _construct() {
         $this->_initSession('admin', 'p4ssw0rd');
         $this->_helper = Mage::helper('pugmore_mageploy');
-        $this->_io = new PugMoRe_Mageploy_Model_Io_File();
+        if($this->_helper->useDb()){
+            $this->_io = new PugMoRe_Mageploy_Model_Io_Db();
+        }else{
+            $this->_io = new PugMoRe_Mageploy_Model_Io_File();
+        }
         return parent::_construct();
     }
 
