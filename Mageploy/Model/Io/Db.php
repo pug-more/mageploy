@@ -72,13 +72,10 @@ class PugMoRe_Mageploy_Model_Io_Db implements PugMoRe_Mageploy_Model_Io_Recordin
                $todo = array();
                $done = array();
                foreach ($todoList as $k=>$v) {
-                   $todo[$k] = implode('|',$v);
+                   $todo[] = implode('|',$v);
                }
-               $i = 0;
-
-               foreach ($doneList as $i => $action) {
-                   $i++;
-                   $done[$i] = implode('|',$action->getAction());
+               foreach ($doneList as $k => $action) {
+                   $done[] = $action->getAction();
                }
 
                foreach ( array_diff ($todo, $done) as $k=>$v) {
@@ -124,7 +121,9 @@ class PugMoRe_Mageploy_Model_Io_Db implements PugMoRe_Mageploy_Model_Io_Recordin
         fputcsv($this->_todo, $stream);
         try{
             $connection->beginTransaction();
-            Mage::getModel('pugmore_mageploy/executed')->setAction($stream)->save();
+            $action = Mage::getModel('pugmore_mageploy/executed');
+            $action->setEntityId($stream[0])
+                ->setAction(implode("|",$stream))->save();
             $connection->commit();
         } catch (Exception $e) {
             $connection->rollBack();
@@ -145,6 +144,6 @@ class PugMoRe_Mageploy_Model_Io_Db implements PugMoRe_Mageploy_Model_Io_Recordin
         if (false === $this->_done) {
             return;
         }
-        Mage::getModel('pugmore_mageploy/executed')->setAction($stream)->save();
+        Mage::getModel('pugmore_mageploy/executed')->setEntityId($stream[0])->setAction(implode('|',$stream))->save();
     }
 }

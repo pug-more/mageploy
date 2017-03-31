@@ -10,7 +10,7 @@ $installer = $this;
 
 $installer->startSetup();
 
-$tableExecuted = $installer->getConnection()->newTable($installer->getTable('pugmore_mageploy/mageploy_executed'))
+$tableExecuted = $installer->getConnection()->newTable($installer->getTable('pugmore_mageploy/executed'))
     ->addColumn('entity_id', Varien_Db_Ddl_Table::TYPE_INTEGER, null, array(
     'unsigned' => true,
     'primary'  => true,

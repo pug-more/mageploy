@@ -5,7 +5,6 @@
             <version>1.2.2</version>
         </PugMoRe_Mageploy>
     </modules>
-    
     <global>
         <resources>
             <pugmore_mageploy_setup>
@@ -19,29 +18,26 @@
                 <class>PugMoRe_Mageploy_Block</class>
             </pugmore_mageploy>
         </blocks>
-
         <models>
             <pugmore_mageploy>
                 <class>PugMoRe_Mageploy_Model</class>
                 <resourceModel>pugmore_mageploy_resource</resourceModel>
             </pugmore_mageploy>
             <pugmore_mageploy_resource>
-                <class>Pugmore_Mageploy_Model_Resource</class>
+                <class>PugMoRe_Mageploy_Model_Resource</class>
                 <entities>
-                    <mageploy_executed>
+                    <executed>
                         <table>mageploy_executed</table>
-                    </mageploy_executed>
-                 </entities>
+                    </executed>
+                </entities>
             </pugmore_mageploy_resource>
         </models>
-
         <helpers>
             <pugmore_mageploy>
                 <class>PugMoRe_Mageploy_Helper</class>
             </pugmore_mageploy>
         </helpers>
     </global>
-    
     <adminhtml>
         <events>
             <controller_action_predispatch>
@@ -62,7 +58,6 @@
             </updates>
         </layout>
     </adminhtml>
-    
     <default>
         <!-- Use this section to register custom Action Trackers -->
         <mageploy>
@@ -105,7 +100,6 @@
                 </store_storeview>
             </actions>
         </mageploy>
-        
         <!-- System Configuration default values -->
         <dev>
             <mageploy>
