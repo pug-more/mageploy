@@ -125,6 +125,11 @@ class PugMoRe_Mageploy_Helper_Data extends Mage_Core_Helper_Abstract
         return 'mageploy_all.csv';
     }
 
+    public function getAdminhtmlFrontname()
+    {
+        return (string) Mage::getConfig()->getNode('admin/routers/adminhtml/args/frontName');
+    }
+
     public function getAllActionsCount()
     {
         if (is_null($this->_io)) {

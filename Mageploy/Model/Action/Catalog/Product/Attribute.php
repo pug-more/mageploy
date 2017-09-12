@@ -8,14 +8,14 @@
 class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Mageploy_Model_Action_Abstract {
 
     const VERSION = '1';
-    
+
     protected $_code = 'catalog_product_attribute';
     protected $_blankableParams = array('key', 'form_key', 'back', 'tab');
 
     protected function _getVersion() {
         return Mage::helper('pugmore_mageploy')->getVersion(2).'.'.self::VERSION;
     }
-    
+
     protected function _getOptionIdByUuid($optionUuid, &$attributeOptionsByValue, &$newOptions)
     {
         $id = 0;
@@ -33,7 +33,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
         }
         return $id;
     }
-    
+
     protected function _getOptionOrderByUuid($optionUuid, $attributeOptionsByValue)
     {
         $order = 0;
@@ -45,7 +45,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
         }
         return $order;
     }
-    
+
     protected function _getAdminOptionValueByOptionId($attributeId, $optionId) {
         $option = Mage::getResourceModel('eav/entity_attribute_option_collection')
                 ->setAttributeFilter($attributeId)
@@ -60,7 +60,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
             return false;
         }
 
-        if ($this->_request->getModuleName() == 'admin') {
+        if ($this->isAdminRequest()) {
             if ($this->_request->getControllerName() == 'catalog_product_attribute') {
                 if (in_array($this->_request->getActionName(), array(/* 'validate', */'save', 'delete'))) {
                     return true;
@@ -87,7 +87,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
                 $attributeUuid = $params['attribute_code'];
             } else {
                 // existing entity
-                // in case of options the only thing we can do is considering 
+                // in case of options the only thing we can do is considering
                 // all options as new; when decoding we will try to guess if
                 // existing options have changed; there isn't any way of
                 // uniquely idenfifying an option
@@ -145,7 +145,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
                     unset($newOption['delete'][$optionId]);
                     $newOption['delete'][$optionUuid] = $delete;
                 }
-                
+
                 $params['option'] = $newOption;
             }
 
@@ -177,7 +177,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
                     unset($params[$key]);
                 }
             }
-            
+
             $result[self::INDEX_EXECUTOR_CLASS] = get_class($this);
             $result[self::INDEX_CONTROLLER_MODULE] = $this->_request->getControllerModule();
             $result[self::INDEX_CONTROLLER_NAME] = $this->_request->getControllerName();
@@ -195,7 +195,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
      * return Mage_Core_Controller_Request_Http
      */
     public function decode($encodedParameters, $version) {
-        // The !empty() ensures that rows without a version number can be 
+        // The !empty() ensures that rows without a version number can be
         // executed (not without any risk).
         if (!empty($version) && $this->_getVersion() != $version) {
             throw new Exception(sprintf("Can't decode the Action encoded with %s Tracker v %s; current Attribute Tracker is v %s ", $this->_code, $version, $this->_getVersion()));
@@ -208,15 +208,15 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
         } else {
             $attributeCode = $parameters['attribute_id'];
         }
-        
-        // Prepare the Attribute Option Structure that will be used to 
-        // decode parameters and try to guess if an existing option has been 
+
+        // Prepare the Attribute Option Structure that will be used to
+        // decode parameters and try to guess if an existing option has been
         // changed or added.
         // Note: we are assuming we never change admin's value
         $attribute = Mage::getResourceModel('eav/entity_attribute_collection')
                     ->setCodeFilter($attributeCode)
                     ->getFirstItem();
-        
+
         if ($attribute->getSourceModel()) {
             $attributeOptions = $attribute->getSource()->getAllOptions(false);
             $attributeOptionsByValue = array();
@@ -235,10 +235,10 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
         // Decode Attribute Options
         if (isset($parameters['option'])) {
             $option = $parameters['option'];
-            
+
             // Used to store new options
             $newOptions = array();
-            
+
             // Value
             $newValues = array();
             foreach ($option['value'] as $optionUuid => $optionValues) {
@@ -250,7 +250,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
                 }
             }
             $parameters['option']['value'] = $newValues;
-            
+
             // Order
             $newOrders = array();
             foreach ($option['order'] as $optionUuid => $optionOrder) {
@@ -258,7 +258,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
                 $newOrders[$optionId] = $optionOrder;
             }
             $parameters['option']['order'] = $newOrders;
-             
+
             // Delete
             $newDeletes = array();
             foreach ($option['delete'] as $optionUuid => $optionDelete) {
@@ -266,7 +266,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
                 $newDeletes[$optionId] = $optionDelete;
             }
             $parameters['option']['delete'] = $newDeletes;
-            
+
         }
 
         // Decode Default Option
@@ -274,7 +274,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_Attribute extends PugMoRe_Ma
             $optionUuid = $parameters['default'][0];
             $parameters['default'][0] = $this->_getOptionIdByUuid($optionUuid, $attributeOptionsByValue, $newOptions);
         }
-        
+
         // Decode Frontend Label
         $newFrontendLabel = array();
         foreach ($parameters['frontend_label'] as $storeCode => $label) {

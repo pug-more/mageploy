@@ -8,14 +8,14 @@
 class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe_Mageploy_Model_Action_Abstract {
 
     const VERSION = '1';
-    
+
     protected $_code = 'catalog_product_attributeSet';
     protected $_blankableParams = array('id', 'key', /*'isAjax',*/ 'form_key');
 
     protected function _getVersion() {
         return Mage::helper('pugmore_mageploy')->getVersion(2).'.'.self::VERSION;
     }
-    
+
     protected function _getEntityTypeCode() {
         return Mage_Catalog_Model_Product::ENTITY;
     }
@@ -29,7 +29,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
             return false;
         }
 
-        if ($this->_request->getModuleName() == 'admin') {
+        if ($this->isAdminRequest()) {
             if ($this->_request->getControllerName() == 'catalog_product_set') {
                 if (in_array($this->_request->getActionName(), array(/* 'validate', */'save', 'delete'))) {
                     return true;
@@ -210,7 +210,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
      */
 
     public function decode($encodedParameters, $version) {
-        // The !empty() ensures that rows without a version number can be 
+        // The !empty() ensures that rows without a version number can be
         // executed (not without any risk).
         if (!empty($version) && $this->_getVersion() != $version) {
             throw new Exception(sprintf("Can't decode the Action encoded with %s Tracker v %s; current Attribute Set Tracker is v %s ", $this->_code, $version, $this->_getVersion()));
@@ -241,7 +241,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
             if ($attributeId == 208) {
                 $break = $here;
             }
-            
+
             $attributeGroupUuid = $attribute[1];
 
             // Is new Group?
@@ -249,7 +249,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Product_AttributeSet extends PugMoRe
                 $attributeGroupId = $attributeGroupUuid;
                 $eavAttributeId = null;
             } else {
-                // $attributeSetUuid is not used; we still have to explode the 
+                // $attributeSetUuid is not used; we still have to explode the
                 // string in order to mantain compatibility with encoding
                 list($attributeGroupName, $attributeSetUuid) = explode(self::UUID_SEPARATOR, $attributeGroupUuid);
                 $attributeGroupId = $helper->getAttributeGroupId($attributeSetId, $attributeGroupName);

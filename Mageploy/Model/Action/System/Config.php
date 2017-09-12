@@ -15,13 +15,13 @@ class PugMoRe_Mageploy_Model_Action_System_Config extends PugMoRe_Mageploy_Model
     protected function _getVersion() {
         return Mage::helper('pugmore_mageploy')->getVersion(2).'.'.self::VERSION;
     }
-    
+
     public function match() {
         if (!$this->_request) {
             return false;
         }
 
-        if ($this->_request->getModuleName() == 'admin') {
+        if ($this->isAdminRequest()) {
             if ($this->_request->getControllerName() == 'system_config') {
                 if (in_array($this->_request->getActionName(), array('save'))) {
                     return true;
@@ -34,7 +34,7 @@ class PugMoRe_Mageploy_Model_Action_System_Config extends PugMoRe_Mageploy_Model
 
     public function encode() {
         $result = parent::encode();
-        
+
         if ($this->_request) {
             $params = $this->_request->getParams();
 
@@ -43,12 +43,12 @@ class PugMoRe_Mageploy_Model_Action_System_Config extends PugMoRe_Mageploy_Model
                     unset($params[$key]);
                 }
             }
-            
+
             // Prevent propagating changes on mageploy's configuration
             if (isset($params['groups']['mageploy']/*['fields']['user']*/)) {
                 unset($params['groups']['mageploy']/*['fields']['user']*/);
             }
-            
+
             $result[self::INDEX_EXECUTOR_CLASS] = get_class($this);
             #$result[self::INDEX_CONTROLLER_MODULE] = $this->_request->getControllerModule();
             $result[self::INDEX_CONTROLLER_MODULE] = 'PugMoRe_Mageploy';
@@ -64,7 +64,7 @@ class PugMoRe_Mageploy_Model_Action_System_Config extends PugMoRe_Mageploy_Model
     }
 
     public function decode($encodedParameters, $version) {
-        // The !empty() ensures that rows without a version number can be 
+        // The !empty() ensures that rows without a version number can be
         // executed (not without any risk).
         if (!empty($version) && $this->_getVersion() != $version) {
             throw new Exception(sprintf("Can't decode the Action encoded with %s Tracker v %s; current System Config Tracker is v %s ", $this->_code, $version, $this->_getVersion()));
