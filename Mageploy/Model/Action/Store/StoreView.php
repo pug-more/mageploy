@@ -7,21 +7,21 @@
 class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Model_Action_Abstract
 {
     const VERSION = '2'; // Change this only if encoding/decoding format changes
-    
+
     protected $_code = 'system_store_storeview';
     protected $_blankableParams = array('key', 'form_key');
 
     protected function _getVersion() {
         return Mage::helper('pugmore_mageploy')->getVersion(2).'.'.self::VERSION;
     }
-    
+
     public function match() {
 
         if (!$this->_request) {
             return false;
         }
 
-        if ($this->_request->getModuleName() == 'admin') {
+        if ($this->isAdminRequest()) {
             if ($this->_request->getControllerName() == 'system_store') {
                 if (in_array($this->_request->getActionName(), array('deleteStorePost'))) {
                     return true;
@@ -35,7 +35,7 @@ class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Mod
 
         return false;
     }
-    
+
     public function encode() {
         $result = parent::encode();
 
@@ -105,7 +105,7 @@ class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Mod
                     unset($params[$key]);
                 }
             }
-            
+
             $result[self::INDEX_EXECUTOR_CLASS] = get_class($this);
             $result[self::INDEX_CONTROLLER_MODULE] = $this->_request->getControllerModule();
             $result[self::INDEX_CONTROLLER_NAME] = $this->_request->getControllerName();
@@ -114,12 +114,12 @@ class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Mod
             $result[self::INDEX_ACTION_DESCR] = sprintf("%s %s Store View '%s'", ucfirst($actionName), $new, $storeCode);
             $result[self::INDEX_VERSION] = $this->_getVersion();
         }
-        
+
         return $result;
     }
 
     public function decode($encodedParameters, $version) {
-        // The !empty() ensures that rows without a version number can be 
+        // The !empty() ensures that rows without a version number can be
         // executed (not without any risk).
         if (!empty($version) && $this->_getVersion() != $version) {
             throw new Exception(sprintf("Can't decode the Action encoded with %s Tracker v %s; current Store View Tracker is v %s ", $this->_code, $version, $this->_getVersion()));
@@ -189,5 +189,5 @@ class PugMoRe_Mageploy_Model_Action_Store_StoreView extends PugMoRe_Mageploy_Mod
         $request->setQuery($params);
         return $request;
     }
-    
+
 }

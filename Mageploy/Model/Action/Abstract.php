@@ -15,35 +15,35 @@ abstract class PugMoRe_Mageploy_Model_Action_Abstract {
     const INDEX_ACTION_NAME         = 'action_name';
     const INDEX_ACTION_PARAMS       = 'action_params';
     const INDEX_VERSION             = 'version';
-    
+
     const UUID_SEPARATOR = '~';
-    
+
     protected $_code = '';
-    
+
     /*
      * @var Mage_Core_Controller_Request_Http
      */
     protected $_request;
-    
+
     protected abstract function _getVersion();
-    
+
     protected function _encodeParams($params) {
         return $params;
     }
-    
+
     protected function _decodeParams($params) {
         return $params;
     }
-    
+
     public function toString() {
         return $this->_code;
     }
-    
+
     public function setRequest($request) {
         $this->_request = $request;
         return $this;
     }
-    
+
     public function match() {
         $h = Mage::helper('pugmore_mageploy');
         $h->log("Module name: %s", $this->_request->getModuleName());
@@ -51,6 +51,11 @@ abstract class PugMoRe_Mageploy_Model_Action_Abstract {
         $h->log("Action name: %s", $this->_request->getActionName());
         $h->log("Request Parameters: %s", print_r($this->_request->getParams(), true));
         return false;
+    }
+
+    public function isAdminRequest()
+    {
+	    return $this->_request->getModuleName() == Mage::helper('pugmore_mageploy')->getAdminhtmlFrontname();
     }
 
     public function encode() {
@@ -65,7 +70,7 @@ abstract class PugMoRe_Mageploy_Model_Action_Abstract {
         );
         return $result;
     }
-    
+
     public function decode($encodedParameters, $version) {
         $request = new Mage_Core_Controller_Request_Http();
         return $request;

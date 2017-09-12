@@ -54,7 +54,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
             return false;
         }
 
-        if ($this->_request->getModuleName() == (string)Mage::getConfig()->getNode('admin/routers/adminhtml/args/frontName')) {
+        if ($this->isAdminRequest()) {
             if ($this->_request->getControllerName() == 'catalog_category') {
                 if (in_array($this->_request->getActionName(), array('save', 'move', 'delete'))) {
                     return true;
@@ -118,7 +118,7 @@ class PugMoRe_Mageploy_Model_Action_Catalog_Category extends PugMoRe_Mageploy_Mo
             } else {
                 $parentId = 0;
             }
-            
+
             if ($parentId) {
                 $parentCategory = Mage::getModel('catalog/category')->load($parentId);
                 $parentUuid = $this->_getCategoryUuidFromPath($parentCategory->getPath());
