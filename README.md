@@ -1,3 +1,5 @@
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
+
 Mageploy is an extension for Magento deployment automation based on Admin actions tracking and replication between different project environments.
 
 How does it work?
